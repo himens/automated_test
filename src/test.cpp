@@ -34,36 +34,7 @@ namespace detail
 
     return args;
   };
-
-  // convert string to digit
-  auto is_digit = [] (const std::string str)
-  {
-    return !str.empty() && (str.find_first_not_of("0123456789.") == std::string::npos);
-  }; 
 };
-
-
-/*********/
-/* Check */
-/*********/
-bool Test::check(const std::string a, const std::string b)
-{
-  bool is_passed = false;
-
-  if (detail::is_digit(a) && detail::is_digit(b)) 
-    is_passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
-
-  else if (!detail::is_digit(a) && !detail::is_digit(b)) 
-    is_passed = a == b;
-
-  else 
-    std::cout << "WARNING: checking data of different types!" << std::endl;
-
-  std::cout << "check " << (is_passed ? "PASSED" : "FAILED") << std::endl;
-
-  return is_passed;
-}
-
 
 /************************/
 /* get command function */
@@ -85,19 +56,12 @@ std::function<void()> Test::get_cmd_function(const std::string name, const std::
     }
 
     // insert_pds
-    if (action == "insert_pds") 
-    {
-      function = std::bind(&Test::insert_pds, this); 
-    }
+    if (action == "insert_pds") function = std::bind(&FunctionStore::insert_pds, &_fun_store); 
 
     // set_thrust
     else if (action == "set_thrust") 
     {
-      if (act_args.size() == 1) 
-      {
-	int value = detail::is_digit(act_args[0]) ? std::stoi(act_args[0]) : 0;
-	function = std::bind(&Test::set_thrust, this, value);
-      }
+      if (act_args.size() == 1) function = std::bind(&FunctionStore::set_thrust, &_fun_store, act_args[0]);
       else std::cout << "WARNING: '\\set_thrust': missing value! \n";
     }
 
@@ -107,7 +71,7 @@ std::function<void()> Test::get_cmd_function(const std::string name, const std::
   /* '\check' */
   else if (name == "\\check")
   {
-    if (args.size() == 2) function = std::bind(&Test::check, this, args[0], args[1]);
+    if (args.size() == 2) function = std::bind(&FunctionStore::check, &_fun_store, args[0], args[1]);
     else std::cout << "WARNING: '\\check': missing arguments! \n";
   }
 
@@ -190,9 +154,9 @@ void Test::parse_test(const std::string filename)
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
 	
-	auto command = detail::get_tag( detail::tokens(line) );
+	auto cmd = detail::get_tag( detail::tokens(line) );
 	auto cmd_args = detail::get_args( detail::tokens(line) );
-	auto fun = get_cmd_function(command, cmd_args);
+	auto fun = get_cmd_function(cmd, cmd_args);
 
 	if (fun) _functions.push_back(fun);
       } 
@@ -204,17 +168,28 @@ void Test::parse_test(const std::string filename)
       }
     }
 
-    /* '\define_command' section */
-    else if (section ==  "\\define_command")
+    /* '\define_cmd' section */
+    else if (section ==  "\\define_cmd")
     {
       if (sect_args.size() == 0)
       {
-	std::cout << "ERROR: '\\define_command': missing command name! \n";
+	std::cout << "ERROR: '\\define_cmd': missing command name! \n";
 	return;
       }
 
       bool end_section_found = false;
-      auto user_command = "\\" + sect_args[0];
+      auto usr_cmd = "\\" + sect_args[0];
+
+      auto usr_args = detail::get_args(sect_args);
+      for (auto arg : usr_args) 
+      {
+	if (arg.front() != '_') 
+	{
+	  std::cout << "[ERROR] '\\define_cmd': command argument '" << arg << "' should begin with '_'! \n"; 
+	  return;
+	}
+      }
+
       std::vector<std::function<void()>> cmd_functions = {};
 
       /* Parse body */ 
@@ -226,9 +201,9 @@ void Test::parse_test(const std::string filename)
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
 
-	auto command = detail::get_tag( detail::tokens(line) );
+	auto cmd = detail::get_tag( detail::tokens(line) );
 	auto cmd_args = detail::get_args( detail::tokens(line) );
-	auto fun = get_cmd_function(command, cmd_args);
+	auto fun = get_cmd_function(cmd, cmd_args);
 
 	if (fun) cmd_functions.push_back(fun);
       } 
@@ -240,7 +215,7 @@ void Test::parse_test(const std::string filename)
       }
       
       auto usr_cmd_function = [cmd_functions]() { for (auto f : cmd_functions) f(); }; // merge all functions
-      _user_cmd_functions[user_command] = usr_cmd_function;
+      _user_cmd_functions[usr_cmd] = usr_cmd_function;
     }
 	
     /* '\\include' section */

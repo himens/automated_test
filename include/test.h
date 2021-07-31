@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "function_store.h"
+
 class Test 
 {
   public:
@@ -30,18 +32,6 @@ class Test
 
     std::vector<std::function<void()>> _functions = {};
     std::map<std::string, std::function<void()>> _user_cmd_functions = {};
-
-    //////////////////////////////////////////////////////////////////
-    // FUNCTIONS 
-    //////////////////////////////////////////////////////////////////
-    /* insert_pds */
-    void insert_pds() { std::cout << "insert_pds! \n"; }
-
-    /* set_thrust */
-    void set_thrust(const int value) { std::cout << "set_thrust to " << value << "\n"; }
-
-    /* check */
-    bool check(const std::string a, const std::string b);
-    ///////////////////////////////////////////////////////////////////
+    FunctionStore _fun_store;
 };
 #endif
