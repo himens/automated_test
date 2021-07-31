@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "function_store.h"
+#include "command.h"
 
 class Test 
 {
@@ -31,7 +32,7 @@ class Test
     std::function<void()> get_cmd_function(const std::string name, const std::vector<std::string> &args);
 
     std::vector<std::function<void()>> _functions = {};
-    std::map<std::string, std::function<void()>> _user_cmd_functions = {};
     FunctionStore _fun_store;
+    std::map<std::string, UserCommand> _user_command = {};
 };
 #endif
