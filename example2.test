@@ -1,0 +1,7 @@
+\define_command test_cmd
+	\do_action set_thrust 10
+	\do_action set_thrust 20
+	\do_action set_thrust 30
+\end
+
+

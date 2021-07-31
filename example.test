@@ -1,0 +1,18 @@
+# This is an example test 
+\include example2.test 
+
+\define_command test2_cmd
+	\test_cmd
+	\do_action set_thrust 40
+	\do_action set_thrust 50
+\end
+
+\begin_step
+	\test_cmd
+	\test2_cmd
+	\do_action insert_pds
+\end
+
+#\begin_step
+#	\do_action set_thrust 999
+#\end
