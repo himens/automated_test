@@ -156,7 +156,7 @@ void Test::parse_test(const std::string filename)
   {
     auto tokens = detail::tokens(line);
 
-    return tokens.size() == 1 && line == "\\end";
+    return tokens.size() == 1 && tokens.front() == "\\end";
   };
   
   /* Open file */

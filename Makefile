@@ -1,5 +1,5 @@
 # Exec
-EXE := test
+EXE := test.exe
 
 # Compiler
 CXX = g++
