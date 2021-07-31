@@ -37,7 +37,7 @@ namespace detail
 };
 
 /************************/
-/* get command function */
+/* Get command function */
 /************************/
 std::function<void()> Test::get_cmd_function(const std::string name, const std::vector<std::string> &args)
 {
@@ -78,13 +78,12 @@ std::function<void()> Test::get_cmd_function(const std::string name, const std::
   /* user function */
   else if (_user_command.count(name) > 0)
   {
-    _user_command[name].replace_parameters(args);
-    
     std::vector<std::function<void()>> cmd_functions = {};
     
     for (auto &cmd : _user_command[name].commands)
     {
-      auto fun = get_cmd_function(cmd.name, cmd.args);
+      auto &pholders = _user_command[name].placeholders;
+      auto fun = get_cmd_function(cmd.name, cmd.replace(pholders, args));
       if (fun) cmd_functions.push_back(fun);
     }
 
@@ -188,23 +187,23 @@ void Test::parse_test(const std::string filename)
       }
 
       auto usr_cmd = "\\" + sect_args[0];
+      auto usr_args = detail::remove_first(sect_args);
+
       if (_user_command.count(usr_cmd) > 0)
       {
 	  std::cout << "[ERROR] '\\define_cmd': user command '" << usr_cmd << "' already defined! \n"; 
 	  return;
       }
-      _user_command[usr_cmd].name = usr_cmd;
 
-      auto usr_params = detail::remove_first(sect_args);
-      for (auto &par : usr_params) 
+      for (auto &arg : usr_args) 
       {
-	if (!Parameter::is_parameter(par)) 
+	if (!Placeholder::is_placeholder(arg)) 
 	{
-	  std::cout << "[ERROR] '\\define_cmd': command parameter '" << par << "' should begin with '_'! \n"; 
+	  std::cout << "[ERROR] '\\define_cmd': placeholder '" << arg << "' should begin with '_'! \n"; 
 	  return;
 	}
 	
-	_user_command[usr_cmd].parameters.push_back(par);
+	_user_command[usr_cmd].placeholders.push_back(arg);
       }
 
       bool end_section_found = false;

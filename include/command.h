@@ -8,65 +8,64 @@
 #include <algorithm>
 #include <functional>
 
-/* Parameter class: a string beginning with "_" */
-class Parameter
+/* Placeholder class: it's a std::string starting with "_" */
+class Placeholder
 {
   public:
-    Parameter(const std::string par) { if (is_parameter(par)) _par = par; }
+    Placeholder(const std::string str) { if (is_placeholder(str)) _pholder = str; }
 
-    friend std::ostream& operator<< (std::ostream& os, const Parameter &par)
+    friend std::ostream& operator<< (std::ostream& os, const Placeholder &pholder)
     {
-      os << par.to_string();
+      os << pholder.to_string();
       return os;
     }
 
     /* Convert to std::string */
-    std::string to_string() const { return _par; }
+    std::string to_string() const { return _pholder; }
 
-    /* Tell if a string is a parameter */
-    static bool is_parameter(const std::string par) { return par.front() == '_'; } 
+    /* Tell if a string is a placeholder */
+    static bool is_placeholder(const std::string str) { return str.front() == '_'; } 
 
   private:
-    std::string _par;
+    std::string _pholder;
 };
 
-/* Command class: store command name + its args */
+/* Command class: it stores command name + its args */
 struct Command
 {
   std::string name;
   std::vector<std::string> args;
 
-  /* Replace a parameter in args with a value */
-  void replace_parameter(const Parameter par, const std::string value)
+  /* Replace placeholders with values */
+  std::vector<std::string> replace(const std::vector<Placeholder> &pholders, 
+                                   const std::vector<std::string> &values)
   {
-    auto it = std::find(args.begin(), args.end(), par.to_string());
-    if (it == args.end()) return;
-    
-   *it = value;
-  }
-};
+    std::vector<std::string> rep_args = args;
 
-struct UserCommand
-{
-  std::string name;
-  std::vector<Command> commands;
-  std::vector<Parameter> parameters;
-
-  /* Replace parameters with values */
-  void replace_parameters(const std::vector<std::string> &values)
-  {
-    if (values.size() != parameters.size())
+    if (values.size() != pholders.size())
     {
-      std::cout << "[WARNING] UserCommand::replace_parameters(): cannot replace parameters";
-      std::cout << " for '" << name << "'! Num. of parameters != num. values! \n";
-      return;
+      std::cout << "[WARNING] Command::subsitute(): cannot replace placeholders";
+      std::cout << " for '" << name << "' command! Num. of placeholders != num. values! \n";
+      return args;
     }
 
-    for (size_t i = 0; i < parameters.size(); i++)
-      for (auto &cmd : commands) cmd.replace_parameter(parameters[i], values[i]);
+    for (size_t i = 0; i < pholders.size(); i++)
+    {
+      auto it = std::find(rep_args.begin(), rep_args.end(), pholders[i].to_string());
+      if (it != rep_args.end()) *it = values[i];
+    }
+
+    return rep_args;
   }
 };
+
+/* UserCommand class: define a user-command which is a set of already existing commands 
+   plus placeholders which stands for numeric arguments to be passed when called. 
+   The user-command can be seen as new function with its arguments.
+ */
+struct UserCommand
+{
+  std::vector<Command> commands;
+  std::vector<Placeholder> placeholders;
+};
 #endif
-
-
-
