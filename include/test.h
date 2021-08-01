@@ -31,7 +31,6 @@ class Test
     /* get command */
     Command* get_command(const std::string name, const std::vector<std::string> &args);
 
-    std::vector<std::function<void()>> _functions = {};
     std::vector<Command*> _commands = {};
     std::map<std::string, UserCmd> _user_command_map = {};
 };
