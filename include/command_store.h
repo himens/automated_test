@@ -13,46 +13,40 @@ class UserCmd : public Command
   public:
     UserCmd() {}
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &args, 
-	    const std::vector<Command*> cmds) : Command(name, args.size()) 
+	    const std::vector<std::string> &pholds, 
+	    const std::vector<Command*> cmds) : Command(name, pholds.size()) 
     { 
       _commands = cmds;
-      set_placeholders(args);
+
+      for (size_t i = 0; i < pholds.size(); i++) 
+	if (Placeholder::is_placeholder(pholds[i])) _placeholders.push_back(pholds[i]); 
     }
     //~UserCmd() { for (auto cmd : _commands) delete cmd; }
 
     void run()
     {
+      // replace placeholders in command
+      auto replace = [&](const std::vector<std::string> args)
+      {
+	auto new_args = args;
+	for (size_t i = 0; i < _placeholders.size(); i++)
+	{
+	  auto it = std::find(new_args.begin(), new_args.end(), _placeholders[i].to_string());
+	  if (it != new_args.end()) *it = this->get_args().at(i);
+	}
+
+	return new_args;
+      };
+
       for (auto cmd : _commands) 
       {
-	auto args = replace_placeholders(cmd);
-	cmd->run(args);
+	auto args = cmd->get_args();
+	cmd->set_args(replace(args));
+	cmd->run();
+	cmd->set_args(args);
       }
     }
     
-    /* Replace placeholders with values */
-    std::vector<std::string> replace_placeholders(Command* cmd)
-    {
-      auto cmd_args = cmd->get_args();
-
-      for (size_t i = 0; i < _placeholders.size(); i++)
-      {
-	auto it = std::find(cmd_args.begin(), cmd_args.end(), _placeholders[i].to_string());
-	if (it != cmd_args.end()) *it = _args[i];
-      }
-
-      return cmd_args;
-    }
-
-    /* Set placeholders */
-    void set_placeholders(const std::vector<std::string> &pholds) 
-    {
-      for (size_t i = 0; i < pholds.size(); i++) 
-      {
-	if (Placeholder::is_placeholder(pholds[i])) _placeholders.push_back(pholds[i]); 
-      }
-    }
-
   private:
     std::vector<Command*> _commands;
     std::vector<Placeholder> _placeholders;
@@ -67,8 +61,8 @@ class CheckCmd : public Command
     void run()
     {
       bool passed = false;
-      auto a = _args[0];
-      auto b = _args[1];
+      auto a = this->get_args().at(0);
+      auto b = this->get_args().at(1);
 
       if (utils::is_digit(a) && utils::is_digit(b)) passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
       else if (!utils::is_digit(a) && !utils::is_digit(b)) passed = a == b;
@@ -86,7 +80,7 @@ class SetThrustCmd : public Command
 
     void run()
     {
-      auto value = _args[0];
+      auto value = this->get_args().at(0);
       int thrust = utils::is_digit(value) ? std::stoi(value) : 0;
       if (!utils::is_digit(value)) std::cout << "WARNING: set_thrust(): value '" << value << "' is not a number! \n";
 

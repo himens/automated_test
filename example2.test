@@ -1,7 +1,6 @@
-\define_command test_cmd
-	\do_action set_thrust 10
-	\do_action set_thrust 20
-	\do_action set_thrust 30
+\define_cmd test _x _y
+	\set_thrust _x
+	\set_thrust _y
+	\insert_pds
 \end
-
 
