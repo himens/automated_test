@@ -11,8 +11,8 @@
 #include <algorithm>
 #include <functional>
 
-#include "function_store.h"
-#include "command.h"
+#include "utils.h"
+#include "command_store.h"
 
 class Test 
 {
@@ -25,14 +25,14 @@ class Test
     void parse_test(const std::string filename);
 
     /* run test */
-    void run() { for (auto fun : _functions) fun(); } 
+    void run() { for (auto cmd : _commands) cmd->run(); } 
 
   private:
-    /* get command function */
-    std::function<void()> get_cmd_function(const std::string name, const std::vector<std::string> &args);
+    /* get command */
+    Command* get_command(const std::string name, const std::vector<std::string> &args);
 
     std::vector<std::function<void()>> _functions = {};
-    FunctionStore _fun_store;
-    std::map<std::string, UserCommand> _user_command = {};
+    std::vector<Command*> _commands = {};
+    std::map<std::string, UserCmd> _user_command_map = {};
 };
 #endif

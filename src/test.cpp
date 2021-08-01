@@ -1,101 +1,25 @@
 #include "test.h"
 
-/***********/
-/* details */
-/***********/
-namespace detail
+/***************/
+/* Get command */
+/***************/
+Command* Test::get_command(const std::string name, const std::vector<std::string> &args)
 {
-  // tokenize line
-  auto tokens = [] (std::string line, const char delim = ' ') 
+  Command *cmd = nullptr;
+
+  if (name == "\\set_thrust") cmd = new SetThrustCmd();
+  else if (name == "\\insert_pds") cmd = new InsertPdsCmd();
+  else if (name == "\\check") cmd = new CheckCmd();
+  else if (_user_command_map.count(name) > 0) 
   {
-    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end());
-
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream iss(line);
-
-    while (std::getline(iss, token, delim)) tokens.push_back(token);
-
-    return tokens;
-  };
-
-  // get first token
-  auto first = [] (const std::vector<std::string> &tokens)
-  {
-    return (tokens.size() != 0 ? tokens.front() : "");
-  };
-
-  // get all except first token
-  auto remove_first = [] (const std::vector<std::string> &tokens)
-  {
-    auto args = tokens;
-    if (tokens.size() > 1) args.erase(args.begin());
-    else args = {};
-
-    return args;
-  };
-};
-
-/************************/
-/* Get command function */
-/************************/
-std::function<void()> Test::get_cmd_function(const std::string name, const std::vector<std::string> &args)
-{
-  std::function<void()> function = {};
-
-  /* '\do_action' */
-  if (name == "\\do_action")
-  {
-    auto action = detail::first(args);
-    auto act_args = detail::remove_first(args);
-
-    if (action.empty()) 
-    {
-      std::cout << "WARNING: empty action!" << std::endl;
-      return {};
-    }
-
-    // insert_pds
-    if (action == "insert_pds") function = std::bind(&FunctionStore::insert_pds, &_fun_store); 
-
-    // set_thrust
-    else if (action == "set_thrust") 
-    {
-      if (act_args.size() == 1) function = std::bind(&FunctionStore::set_thrust, &_fun_store, act_args[0]);
-      else std::cout << "WARNING: '\\set_thrust': missing value! \n";
-    }
-
-    else std::cout << "WARNING: action '" << action << "' not known! \n";
-  } // end \do_action
-
-  /* '\check' */
-  else if (name == "\\check")
-  {
-    if (args.size() == 2) function = std::bind(&FunctionStore::check, &_fun_store, args[0], args[1]);
-    else std::cout << "WARNING: '\\check': missing arguments! \n";
+    cmd = new UserCmd(_user_command_map[name]); // check if object is copied!!!
   }
+  else std::cout << "ERROR: Unknown command '" << name << "'! \n";
 
-  /* user function */
-  else if (_user_command.count(name) > 0)
-  {
-    std::vector<std::function<void()>> cmd_functions = {};
-    
-    for (auto &cmd : _user_command[name].commands)
-    {
-      auto &pholders = _user_command[name].placeholders;
-      auto fun = get_cmd_function(cmd.name, cmd.replace(pholders, args));
-      if (fun) cmd_functions.push_back(fun);
-    }
+  cmd->set_args(args);
 
-    function = [cmd_functions]() { for (auto f : cmd_functions) f(); }; // merge all functions
-  }
-
-  // Parse other stuff...
-  else std::cout << "WARNING: function '" << name << "' not found! \n";
-
-  return function;
+  return cmd;
 }
-
 
 /*******************/
 /* Parse test file */
@@ -127,7 +51,7 @@ void Test::parse_test(const std::string filename)
   // utility function: check end section in line
   auto is_end_section = [] (const std::string line)
   {
-    auto tokens = detail::tokens(line);
+    auto tokens = utils::tokens(line);
 
     return tokens.size() == 1 && tokens.front() == "\\end";
   };
@@ -146,8 +70,8 @@ void Test::parse_test(const std::string filename)
   {   
     if (is_comment(line)) continue;
 
-    auto section = detail::first( detail::tokens(line) );
-    auto sect_args = detail::remove_first( detail::tokens(line) );
+    auto section = utils::first( utils::tokens(line) );
+    auto sect_args = utils::remove_first( utils::tokens(line) );
 
     /* '\begin_step' section */
     if (section == "\\begin_step")
@@ -162,12 +86,12 @@ void Test::parse_test(const std::string filename)
 	if (end_section_found) break;
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
-	
-	auto cmd = detail::first( detail::tokens(line) );
-	auto cmd_args = detail::remove_first( detail::tokens(line) );
-	auto fun = get_cmd_function(cmd, cmd_args);
 
-	if (fun) _functions.push_back(fun);
+	auto cmd = utils::first( utils::tokens(line) );
+	auto cmd_args = utils::remove_first( utils::tokens(line) );
+
+	auto new_cmd = get_command(cmd, cmd_args);
+	if (new_cmd) _commands.push_back(new_cmd);
       } 
 
       if (!end_section_found) 
@@ -186,10 +110,10 @@ void Test::parse_test(const std::string filename)
 	return;
       }
 
-      auto usr_cmd = "\\" + sect_args[0];
-      auto usr_args = detail::remove_first(sect_args);
+      auto usr_cmd = "\\" + utils::first(sect_args);
+      auto usr_args = utils::remove_first(sect_args);
 
-      if (_user_command.count(usr_cmd) > 0)
+      if (_user_command_map.count(usr_cmd) > 0)
       {
 	  std::cout << "[ERROR] '\\define_cmd': user command '" << usr_cmd << "' already defined! \n"; 
 	  return;
@@ -202,10 +126,9 @@ void Test::parse_test(const std::string filename)
 	  std::cout << "[ERROR] '\\define_cmd': placeholder '" << arg << "' should begin with '_'! \n"; 
 	  return;
 	}
-	
-	_user_command[usr_cmd].placeholders.push_back(arg);
       }
 
+      std::vector<Command*> commands = {};
       bool end_section_found = false;
 
       /* Parse body */ 
@@ -217,10 +140,11 @@ void Test::parse_test(const std::string filename)
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
 
-	auto cmd = detail::first( detail::tokens(line) );
-	auto cmd_args = detail::remove_first( detail::tokens(line) );
+	auto cmd = utils::first( utils::tokens(line) );
+	auto cmd_args = utils::remove_first( utils::tokens(line) );
 	
-        _user_command[usr_cmd].commands.push_back({cmd, cmd_args});
+	auto new_cmd = get_command(cmd, cmd_args); 
+	if (new_cmd) commands.push_back(new_cmd);
       } 
       
       if (!end_section_found) 
@@ -228,6 +152,9 @@ void Test::parse_test(const std::string filename)
 	std::cout << "ERROR: Cannot find '\\end' of '" << section << "' section! \n"; 
 	return;
       }
+
+      UserCmd user_command = {usr_cmd, usr_args, commands}; // add user-command
+      _user_command_map[usr_cmd] = user_command;
     }
 	
     /* '\\include' section */

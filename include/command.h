@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 #include <algorithm>
-#include <functional>
 
 /* Placeholder class: it's a std::string starting with "_" */
 class Placeholder
@@ -31,41 +30,41 @@ class Placeholder
 };
 
 /* Command class: it stores command name + its args */
-struct Command
+class Command
 {
-  std::string name;
-  std::vector<std::string> args;
+  public:
+    Command() {};
+    Command(const std::string name, const size_t n) 
+    { 
+      _args.resize(n);
+      _name = name; 
+    } 
+    ~Command() {};
 
-  /* Replace placeholders with values */
-  std::vector<std::string> replace(const std::vector<Placeholder> &pholders, 
-                                   const std::vector<std::string> &values)
-  {
-    std::vector<std::string> rep_args = args;
+    /* Run command*/
+    virtual void run() = 0;
 
-    if (values.size() != pholders.size())
+    void run(const std::vector<std::string> &args) 
     {
-      std::cout << "[WARNING] Command::subsitute(): cannot replace placeholders";
-      std::cout << " for '" << name << "' command! Num. of placeholders != num. values! \n";
-      return args;
-    }
+      set_args(args);
+      run();
+    };
 
-    for (size_t i = 0; i < pholders.size(); i++)
+
+    /* Set/get command arguments */
+    void set_args(const std::vector<std::string> &args)
     {
-      auto it = std::find(rep_args.begin(), rep_args.end(), pholders[i].to_string());
-      if (it != rep_args.end()) *it = values[i];
+      if (args.size() == _args.size()) _args = args;
+      else 
+      {
+	std::cout << "[WARNING]: 'Command::set_args(): command '" << _name << "' needs '" << _args.size() << "' arguments";
+	std::cout << ", provided '" << args.size() << "'! \n";
+      }
     }
+    std::vector<std::string> get_args() const { return _args; }
 
-    return rep_args;
-  }
-};
-
-/* UserCommand class: define a user-command which is a set of already existing commands 
-   plus placeholders which stands for numeric arguments to be passed when called. 
-   The user-command can be seen as new function with its arguments.
- */
-struct UserCommand
-{
-  std::vector<Command> commands;
-  std::vector<Placeholder> placeholders;
+  protected:
+    std::string _name;
+    std::vector<std::string> _args;
 };
 #endif
