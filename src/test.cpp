@@ -153,8 +153,7 @@ void Test::parse_test(const std::string filename)
 	return;
       }
 
-      UserCmd user_command = {usr_cmd, usr_args, commands}; // add user-command
-      _user_command_map[usr_cmd] = user_command;
+      _user_command_map[usr_cmd] = {usr_cmd, usr_args, commands};
     }
 	
     /* '\\include' section */
