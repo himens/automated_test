@@ -39,27 +39,26 @@ class Command
       _args.resize(n);
       _name = name; 
     } 
-    ~Command() {};
 
     /* Run command*/
     virtual void run() = 0;
 
-    /* Set/get command arguments */
+    /* Set/get */
     void set_args(const std::vector<std::string> &args)
     {
       if (args.size() == _args.size()) _args = args;
       else 
       {
-	std::cout << "[WARNING]: 'Command::set_args(): command '" << _name << "' needs '" << _args.size() << "' arguments"
-	          << ", provided: '" << args.size() << "'! \n";
+	std::cout << "[WARNING]: 'Command::set_args(): command '" << _name << "' needs " << _args.size() << " arguments"
+	          << ", " << args.size() << " provided! \n";
       }
     }
     const std::vector<std::string> &get_args() const { return _args; }
 
-  protected:
-    std::string _name;
+    std::string get_name() const { return _name; }
 
   private:
+    std::string _name;
     std::vector<std::string> _args;
 };
 #endif

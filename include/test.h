@@ -24,14 +24,18 @@ class Test
     /* Parse test file */
     void parse_test(const std::string filename);
 
-    /* run test */
-    void run() { for (auto cmd : _commands) cmd->run(); } 
+    /* Run test */
+    void run();
+
+    /* Get command */
+    std::shared_ptr<Command> get_command(const std::string name, const std::vector<std::string> &args);
 
   private:
-    /* get command */
-    Command* get_command(const std::string name, const std::vector<std::string> &args);
+    /* Print banner */
+    void print_banner(const std::string, size_t length = 0);
 
-    std::vector<Command*> _commands = {};
+    bool _file_parsed = false;
+    std::vector<std::shared_ptr<Command>> _commands = {};
     std::map<std::string, UserCmd> _user_command_map = {};
 };
 #endif

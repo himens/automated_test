@@ -14,14 +14,13 @@ class UserCmd : public Command
     UserCmd() {}
     UserCmd(const std::string name, 
 	    const std::vector<std::string> &pholds, 
-	    const std::vector<Command*> cmds) : Command(name, pholds.size()) 
+	    const std::vector<std::shared_ptr<Command>> &cmds) : Command(name, pholds.size()) 
     { 
       _commands = cmds;
 
       for (size_t i = 0; i < pholds.size(); i++) 
 	if (Placeholder::is_placeholder(pholds[i])) _placeholders.push_back(pholds[i]); 
     }
-    //~UserCmd() { for (auto cmd : _commands) delete cmd; }
 
     void run()
     {
@@ -48,7 +47,7 @@ class UserCmd : public Command
     }
     
   private:
-    std::vector<Command*> _commands;
+    std::vector<std::shared_ptr<Command>> _commands;
     std::vector<Placeholder> _placeholders;
 };
 

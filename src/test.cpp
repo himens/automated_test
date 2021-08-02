@@ -1,25 +1,63 @@
 #include "test.h"
 
+/************/
+/* Run test */
+/************/
+void Test::run()
+{
+  if (!_file_parsed) return;
+
+  print_banner("Run test!");
+
+  for (auto cmd : _commands)
+  {
+    std::cout << "Running test: '" << cmd->get_name() << "'\n";
+    cmd->run();
+  }
+  
+  print_banner("Test done!");
+}
+
+
+/****************/
+/* Print banner */
+/****************/
+void Test::print_banner(const std::string str, size_t length)
+{
+  if (length == 0) length = str.size() + 10;
+
+  std::cout << "\n";
+  std::cout << std::string(length, '*') << "\n";
+  std::cout << str << "\n";
+  std::cout << std::string(length, '*') << "\n";
+}
+
+
 /***************/
 /* Get command */
 /***************/
-Command* Test::get_command(const std::string name, const std::vector<std::string> &args)
+std::shared_ptr<Command> Test::get_command(const std::string name, const std::vector<std::string> &args)
 {
-  Command *cmd = nullptr;
+  std::shared_ptr<Command> cmd = nullptr;
 
-  if (name == "\\set_thrust") cmd = new SetThrustCmd();
-  else if (name == "\\insert_pds") cmd = new InsertPdsCmd();
-  else if (name == "\\check") cmd = new CheckCmd();
+  if (name == "\\set_thrust") cmd = std::make_shared<SetThrustCmd>();
+  else if (name == "\\insert_pds") cmd = std::make_shared<InsertPdsCmd>();
+  else if (name == "\\check") cmd = std::make_shared<CheckCmd>();
   else if (_user_command_map.count(name) > 0) 
   {
-    cmd = new UserCmd(_user_command_map[name]); // check if object is copied!!!
+    cmd = std::make_shared<UserCmd>(_user_command_map[name]); // check if object is copied!!!
   }
-  else std::cout << "ERROR: Unknown command '" << name << "'! \n";
+  else 
+  {
+    std::cout << "ERROR: Unknown command '" << name << "'! \n";
+    return nullptr;
+  }
 
   cmd->set_args(args);
 
   return cmd;
 }
+
 
 /*******************/
 /* Parse test file */
@@ -56,7 +94,10 @@ void Test::parse_test(const std::string filename)
     return tokens.size() == 1 && tokens.front() == "\\end";
   };
   
+  print_banner("Read file: " + filename);
+
   /* Open file */
+  _file_parsed = false;
   std::ifstream file(filename, std::ios::in);
   if (!file.good()) 
   {
@@ -128,8 +169,8 @@ void Test::parse_test(const std::string filename)
 	}
       }
 
-      std::vector<Command*> commands = {};
       bool end_section_found = false;
+      std::vector<std::shared_ptr<Command>> commands = {};
 
       /* Parse body */ 
       while (std::getline(file, line))
@@ -166,11 +207,14 @@ void Test::parse_test(const std::string filename)
       }	
 
       parse_test(sect_args[0]); // recursive parsing
+      if (!_file_parsed) return;
     }
     
     /* Unknown section */
     else std::cout << "WARNING: unknown section '" << section << "'! \n";
   } // end parse file
+
+  _file_parsed = true;
 }
 
 
