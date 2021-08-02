@@ -24,17 +24,14 @@ class UserCmd : public Command
 
     void run()
     {
-      // replace placeholders in command
-      auto replace = [&](const std::vector<std::string> args)
+      // replace placeholders 
+      auto replace = [&](std::vector<std::string> args)
       {
-	auto new_args = args;
 	for (size_t i = 0; i < _placeholders.size(); i++)
-	{
-	  auto it = std::find(new_args.begin(), new_args.end(), _placeholders[i].to_string());
-	  if (it != new_args.end()) *it = this->get_args().at(i);
-	}
+	  for (auto &arg : args) 
+	    if (_placeholders[i].to_string() == arg) arg = this->get_args().at(i);
 
-	return new_args;
+	return args;
       };
 
       for (auto cmd : _commands) 
@@ -65,7 +62,11 @@ class CheckCmd : public Command
 
       if (utils::is_digit(a) && utils::is_digit(b)) passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
       else if (!utils::is_digit(a) && !utils::is_digit(b)) passed = a == b;
-      else std::cout << "WARNING: checking data of different types!" << std::endl;
+      else 
+      {
+	std::cout << "WARNING: checking data of different types!" << std::endl;
+	return;
+      }
 
       std::cout << "check(): " << (passed ? "PASSED" : "FAILED") << std::endl;
     }
@@ -81,7 +82,11 @@ class SetThrustCmd : public Command
     {
       auto value = this->get_args().at(0);
       int thrust = utils::is_digit(value) ? std::stoi(value) : 0;
-      if (!utils::is_digit(value)) std::cout << "WARNING: set_thrust(): value '" << value << "' is not a number! \n";
+      if (!utils::is_digit(value)) 
+      {
+	std::cout << "WARNING: set_thrust(): value '" << value << "' is not a number! \n";
+	return;
+      }
 
       std::cout << "set_thrust(): thrust set to " << thrust << "\n"; 
     }

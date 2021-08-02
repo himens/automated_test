@@ -2,11 +2,13 @@
 \include my_commands.test 
 
 \define_cmd test2 _x
-	\test _x _x
+	\test 1 _x
+	\check 1.2 1.211
 \end
 
 \begin_step
 	\test2 1
+	\test 999 1000
 \end
 
 #\begin_step

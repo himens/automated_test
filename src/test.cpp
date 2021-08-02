@@ -11,7 +11,7 @@ void Test::run()
 
   for (auto cmd : _commands)
   {
-    std::cout << "Running test: '" << cmd->get_name() << "'\n";
+    std::cout << "\nRunning test: '" << cmd->get_name() << ":'\n";
     cmd->run();
   }
   
