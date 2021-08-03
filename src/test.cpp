@@ -33,29 +33,6 @@ void Test::print_banner(const std::string str, size_t length)
 }
 
 
-/***************/
-/* Get command */
-/***************/
-std::shared_ptr<Command> Test::get_command(const std::string name, const std::vector<std::string> &args)
-{
-  std::shared_ptr<Command> cmd = nullptr;
-
-  if (name == "\\set_thrust") cmd = std::make_shared<SetThrustCmd>();
-  else if (name == "\\insert_pds") cmd = std::make_shared<InsertPdsCmd>();
-  else if (name == "\\check") cmd = std::make_shared<CheckCmd>();
-  else if (_user_command_map.count(name) > 0) cmd = std::make_shared<UserCmd>(_user_command_map[name]); 
-  else 
-  {
-    std::cout << "ERROR: Unknown command '" << name << "'! \n";
-    return nullptr;
-  }
-
-  cmd->set_args(args);
-
-  return cmd;
-}
-
-
 /*******************/
 /* Parse test file */
 /*******************/
@@ -125,11 +102,14 @@ void Test::parse_test(const std::string filename)
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
 
-	auto cmd = utils::first( utils::tokens(line) );
+	auto cmd_name = utils::first( utils::tokens(line) );
 	auto cmd_args = utils::remove_first( utils::tokens(line) );
-
-	auto new_cmd = get_command(cmd, cmd_args);
-	if (new_cmd) _commands.push_back(new_cmd);
+	auto cmd = get_command(cmd_name);
+	if (cmd) 
+	{
+	  cmd->set_args(cmd_args);
+	  _commands.push_back(cmd);
+	}
       } 
 
       if (!end_section_found) 
@@ -178,11 +158,14 @@ void Test::parse_test(const std::string filename)
 	if (is_comment(line)) continue;
 	if (is_not_indented(line)) return;
 
-	auto cmd = utils::first( utils::tokens(line) );
+	auto cmd_name = utils::first( utils::tokens(line) );
 	auto cmd_args = utils::remove_first( utils::tokens(line) );
-	
-	auto new_cmd = get_command(cmd, cmd_args); 
-	if (new_cmd) commands.push_back(new_cmd);
+	auto cmd = get_command(cmd_name);
+	if (cmd) 
+	{
+	  cmd->set_args(cmd_args);
+	  commands.push_back(cmd);
+	}
       } 
       
       if (!end_section_found) 
