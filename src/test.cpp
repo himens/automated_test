@@ -128,12 +128,12 @@ void Test::parse_test(const std::string filename)
 	return;
       }
 
-      auto usr_cmd = "\\" + utils::first(sect_args);
+      auto usr_cmd_name = "\\" + utils::first(sect_args);
       auto usr_args = utils::remove_first(sect_args);
 
-      if (_user_command_map.count(usr_cmd) > 0)
+      if (_user_command_map.count(usr_cmd_name) > 0)
       {
-	  std::cout << "[ERROR] '\\define_cmd': user command '" << usr_cmd << "' already defined! \n"; 
+	  std::cout << "[ERROR] '\\define_cmd': user command '" << usr_cmd_name << "' already defined! \n"; 
 	  return;
       }
 
@@ -174,7 +174,7 @@ void Test::parse_test(const std::string filename)
 	return;
       }
 
-      _user_command_map[usr_cmd] = {usr_cmd, usr_args, commands};
+      _user_command_map[usr_cmd_name] = {usr_cmd_name, usr_args, commands};
     }
 	
     /* '\\include' section */
