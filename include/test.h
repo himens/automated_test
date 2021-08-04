@@ -19,7 +19,6 @@ class Test
   public:
     Test () {};
     Test (const std::string filename) { parse_test(filename); };
-    ~Test () {};
     
     /* Parse test file */
     void parse_test(const std::string filename);
