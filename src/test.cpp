@@ -5,13 +5,11 @@
 /************/
 void Test::run()
 {
-  if (!_file_parsed) return;
-
   print_banner("Run test!");
 
   for (auto cmd : _commands)
   {
-    std::cout << "\nRunning test: '" << cmd->get_name() << ":'\n";
+    std::cout << "\nRunning test: '" << cmd->get_name() << "'\n";
     cmd->run();
   }
   
@@ -39,31 +37,34 @@ void Test::print_banner(const std::string str, size_t length)
 void Test::parse_test(const std::string filename)
 {
   // utility function: skip lines
-  auto is_comment = [](const std::string line)
+  auto is_comment = [](std::string line)
   {
+    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
+
     return line.empty() ||   // skip empty line
            (line.front() == '#' || line.front() == '"'); // skip line with comment
   };
 
   // utility function: check if line is indented
-  auto is_not_indented = [](const std::string line)
+  auto check_formatting = [&](std::string line)
   {
     auto num_tabs = std::count(line.begin(), line.end(), '\t');
-    bool is_not_indented = line != "\\end" && (line.front() != '\t' || num_tabs != 1); 
+    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
 
-    if (is_not_indented) 
+    bool bad_line = (line != "\\end") && !is_comment(line) && ((num_tabs != 1) || (line.front() != '\\')); 
+
+    if (bad_line) 
     {
-      if (!num_tabs) std::cout << "ERROR: line '" << line << "' not indented (tab missing)! \n";
-      else std::cout << "ERROR: line '" << line << "' not indented (" << num_tabs << " tab)! \n";
+      if (!num_tabs) throw Error("Line '" + line + "' not indented (tab missing)!");
+      else if (num_tabs > 1) throw Error("Line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
+      else if (line.front() != '\\') throw Error("Line '" + line + "' should begin with '\\'!");
     }
-
-    return is_not_indented;
   };
 
   // utility function: check end section in line
   auto is_end_section = [] (const std::string line)
   {
-    auto tokens = utils::tokens(line);
+    auto tokens = Utils::tokens(line);
 
     return tokens.size() == 1 && tokens.front() == "\\end";
   };
@@ -71,12 +72,10 @@ void Test::parse_test(const std::string filename)
   print_banner("Read file: " + filename);
 
   /* Open file */
-  _file_parsed = false;
   std::ifstream file(filename, std::ios::in);
   if (!file.good()) 
   {
-    std::cout << "ERROR: Cannot open file '" << filename << "' \n";
-    return; 
+    throw Error("Cannot open file '" + filename + "'");
   }
 
   /* Parse file */
@@ -85,8 +84,8 @@ void Test::parse_test(const std::string filename)
   {   
     if (is_comment(line)) continue;
 
-    auto section = utils::first( utils::tokens(line) );
-    auto sect_args = utils::remove_first( utils::tokens(line) );
+    auto section = Utils::first( Utils::tokens(line) );
+    auto sect_args = Utils::remove_first( Utils::tokens(line) );
 
     /* '\begin_step' section */
     if (section == "\\begin_step")
@@ -96,14 +95,14 @@ void Test::parse_test(const std::string filename)
       /* Parse body */
       while (std::getline(file, line))
       {
-	end_section_found = is_end_section(line); 
+	check_formatting(line);
 
+	end_section_found = is_end_section(line); 
 	if (end_section_found) break;
 	if (is_comment(line)) continue;
-	if (is_not_indented(line)) return;
 
-	auto cmd_name = utils::first( utils::tokens(line) );
-	auto cmd_args = utils::remove_first( utils::tokens(line) );
+	auto cmd_name = Utils::first( Utils::tokens(line) );
+	auto cmd_args = Utils::remove_first( Utils::tokens(line) );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
@@ -114,8 +113,7 @@ void Test::parse_test(const std::string filename)
 
       if (!end_section_found) 
       {
-	std::cout << "ERROR: Cannot find '\\end' of '" << section << "' section! \n"; 
-	return;
+	throw Error("Cannot find '\\end' of '" + section + "' section!"); 
       }
     }
 
@@ -124,25 +122,22 @@ void Test::parse_test(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	std::cout << "ERROR: '\\define_cmd': missing command name! \n";
-	return;
+	throw Error("'\\define_cmd': missing command name!");
       }
 
-      auto usr_cmd_name = "\\" + utils::first(sect_args);
-      auto usr_args = utils::remove_first(sect_args);
+      auto usr_cmd_name = Utils::first(sect_args);
+      auto placeholders = Utils::remove_first(sect_args);
 
-      if (_user_command_map.count(usr_cmd_name) > 0)
+      if (_user_command_map.count("\\" + usr_cmd_name) > 0)
       {
-	  std::cout << "[ERROR] '\\define_cmd': user command '" << usr_cmd_name << "' already defined! \n"; 
-	  return;
+        throw Error("'\\define_cmd': user command '" + usr_cmd_name + "' already defined!"); 
       }
 
-      for (auto &arg : usr_args) 
+      for (auto &p : placeholders) 
       {
-	if (!Placeholder::is_placeholder(arg)) 
+	if (!Placeholder::is_placeholder(p)) 
 	{
-	  std::cout << "[ERROR] '\\define_cmd': placeholder '" << arg << "' should begin with '_'! \n"; 
-	  return;
+	  throw Error("'\\define_cmd': placeholder '" + p + "' should begin with '_'!"); 
 	}
       }
 
@@ -152,14 +147,14 @@ void Test::parse_test(const std::string filename)
       /* Parse body */ 
       while (std::getline(file, line))
       {
-	end_section_found = is_end_section(line); 
+	check_formatting(line);
 
+	end_section_found = is_end_section(line); 
 	if (end_section_found) break;
 	if (is_comment(line)) continue;
-	if (is_not_indented(line)) return;
 
-	auto cmd_name = utils::first( utils::tokens(line) );
-	auto cmd_args = utils::remove_first( utils::tokens(line) );
+	auto cmd_name = Utils::first( Utils::tokens(line) );
+	auto cmd_args = Utils::remove_first( Utils::tokens(line) );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
@@ -170,11 +165,10 @@ void Test::parse_test(const std::string filename)
       
       if (!end_section_found) 
       {
-	std::cout << "ERROR: Cannot find '\\end' of '" << section << "' section! \n"; 
-	return;
+	throw Error("Cannot find '\\end' of '" + section + "' section!"); 
       }
 
-      _user_command_map[usr_cmd_name] = {usr_cmd_name, usr_args, commands};
+      _user_command_map["\\" + usr_cmd_name] = {usr_cmd_name, placeholders, commands};
     }
 	
     /* '\\include' section */
@@ -182,19 +176,18 @@ void Test::parse_test(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	std::cout << "ERROR: '\\include': missing filename! \n";
-	return;
+	throw Error("\\include': missing filename!");
       }	
 
       parse_test(sect_args[0]); // recursive parsing
-      if (!_file_parsed) return;
     }
     
     /* Unknown section */
-    else std::cout << "WARNING: unknown section '" << section << "'! \n";
+    else 
+    {
+      throw Error("Unknown section '" + section + "'!");
+    }	
   } // end parse file
-
-  _file_parsed = true;
 }
 
 

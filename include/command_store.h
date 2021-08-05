@@ -13,13 +13,12 @@ class UserCmd : public Command
   public:
     UserCmd() {}
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &pholds, 
-	    const std::vector<std::shared_ptr<Command>> &cmds) : Command(name, pholds.size()) 
+	    const std::vector<std::string> &placeholders, 
+	    const std::vector<std::shared_ptr<Command>> &cmds) : Command(name, placeholders.size()) 
     { 
       _commands = cmds;
 
-      for (size_t i = 0; i < pholds.size(); i++) 
-	if (Placeholder::is_placeholder(pholds[i])) _placeholders.push_back(pholds[i]); 
+      for (auto &p : placeholders) if (Placeholder::is_placeholder(p)) _placeholders.push_back(p); 
     }
 
     void run()
@@ -60,12 +59,11 @@ class CheckCmd : public Command
       auto a = this->get_args().at(0);
       auto b = this->get_args().at(1);
 
-      if (utils::is_digit(a) && utils::is_digit(b)) passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
-      else if (!utils::is_digit(a) && !utils::is_digit(b)) passed = a == b;
+      if (Utils::is_digit(a) && Utils::is_digit(b)) passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
+      else if (!Utils::is_digit(a) && !Utils::is_digit(b)) passed = a == b;
       else 
       {
-	std::cout << "WARNING: checking data of different types!" << std::endl;
-	return;
+	throw Error("CheckCmd: Checking data of different types!");
       }
 
       std::cout << "check(): " << (passed ? "PASSED" : "FAILED") << std::endl;
@@ -81,11 +79,10 @@ class SetThrustCmd : public Command
     void run()
     {
       auto value = this->get_args().at(0);
-      int thrust = utils::is_digit(value) ? std::stoi(value) : 0;
-      if (!utils::is_digit(value)) 
+      int thrust = Utils::is_digit(value) ? std::stoi(value) : 0;
+      if (!Utils::is_digit(value)) 
       {
-	std::cout << "WARNING: set_thrust(): value '" << value << "' is not a number! \n";
-	return;
+	throw Error("SetThrustCmd: Value '" + value + "' is not a number!");
       }
 
       std::cout << "set_thrust(): thrust set to " << thrust << "\n"; 

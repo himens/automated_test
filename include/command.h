@@ -7,6 +7,8 @@
 #include <vector>
 #include <algorithm>
 
+#include "error.h"
+
 /* Placeholder class: it's a std::string starting with "_" */
 class Placeholder
 {
@@ -49,8 +51,8 @@ class Command
       if (args.size() == _args.size()) _args = args;
       else 
       {
-	std::cout << "[WARNING]: 'Command::set_args(): command '" << _name << "' needs " << _args.size() << " arguments"
-	          << ", " << args.size() << " provided! \n";
+	throw Error("Command '" + _name + "' needs " + std::to_string(_args.size()) + 
+	    	    " arguments, " + std::to_string(args.size()) + " provided!");
       }
     }
     const std::vector<std::string> &get_args() const { return _args; }

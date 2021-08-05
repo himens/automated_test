@@ -1,16 +1,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <vector>
-#include <memory>
-#include <algorithm>
-#include <functional>
-
 #include "utils.h"
 #include "command_store.h"
 
@@ -37,8 +27,7 @@ class Test
       else if (_user_command_map.count(name) > 0) cmd = std::make_shared<UserCmd>(_user_command_map[name]);
       else 
       {
-	std::cout << "ERROR: Unknown command '" << name << "'! \n";
-	return nullptr;
+	throw Error("Unknown command '" + name + "'!");
       }
 
       return cmd;
@@ -48,7 +37,6 @@ class Test
     /* Print banner */
     void print_banner(const std::string, size_t length = 0);
 
-    bool _file_parsed = false;
     std::vector<std::shared_ptr<Command>> _commands = {};
     std::map<std::string, UserCmd> _user_command_map = {};
 };

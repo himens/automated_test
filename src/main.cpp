@@ -2,8 +2,16 @@
 
 int main()
 {
-  Test test("example.test");
-  test.run();
+  try
+  {
+    Test test("example.test");
+    test.run();
+  }
+  catch (const Error &e) 
+  { 
+    std::cout << e.what() << "\n"; 
+  }
+
 
   return 0;
 }
