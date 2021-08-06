@@ -41,31 +41,26 @@ void Test::parse_test(const std::string filename)
   {
     line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
 
-    return line.empty() ||   // skip empty line
-           (line.front() == '#' || line.front() == '"'); // skip line with comment
+    return line.empty() || line.front() == '#'; // skip line with comment or empty
   };
 
   // utility function: check if line is indented
   auto check_formatting = [&](std::string line)
   {
-    auto num_tabs = std::count(line.begin(), line.end(), '\t');
-    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
+    if (line == "\\end" || is_comment(line)) return; // if comment or end section, it's ok
 
-    bool bad_line = (line != "\\end") && !is_comment(line) && ((num_tabs != 1) || (line.front() != '\\')); 
+    auto num_tabs = std::count(line.begin(), line.end(), '\t'); // require 1-tab indentation
+    if (!num_tabs) throw Error("Line '" + line + "' not indented (tab missing)!");
+    if (num_tabs > 1) throw Error("Line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
 
-    if (bad_line) 
-    {
-      if (!num_tabs) throw Error("Line '" + line + "' not indented (tab missing)!");
-      else if (num_tabs > 1) throw Error("Line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
-      else if (line.front() != '\\') throw Error("Line '" + line + "' should begin with '\\'!");
-    }
+    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // body lines should begin with '\\'
+    if (line.front() != '\\') throw Error("Line '" + line + "' should begin with '\\'!");
   };
 
   // utility function: check end section in line
   auto is_end_section = [] (const std::string line)
   {
     auto tokens = Utils::tokens(line);
-
     return tokens.size() == 1 && tokens.front() == "\\end";
   };
   
