@@ -57,6 +57,7 @@ class Command
     }
     const std::vector<std::string> &get_args() const { return _args; }
 
+    void set_name(const std::string name) { _name = name; }
     std::string get_name() const { return _name; }
 
   private:
