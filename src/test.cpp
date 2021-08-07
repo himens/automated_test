@@ -130,10 +130,10 @@ void Test::parse_test(const std::string filename)
 
       for (auto &arg : usr_cmd_args) 
       {
-	if (!Placeholder::is_placeholder(arg)) 
-	{
-	  throw Error("'\\define_cmd': placeholder '" + arg + "' should begin with '_'!"); 
-	}
+        if (!Placeholder::is_placeholder(arg)) 
+        {
+          throw Error("'\\define_cmd': '" + arg + "' should be a placeholder! Try: '_" + arg + "'!"); 
+        }
       }
 
       std::vector<std::shared_ptr<Command>> commands = {};

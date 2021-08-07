@@ -13,7 +13,11 @@
 class Placeholder
 {
   public:
-    Placeholder(const std::string str) { if (is_placeholder(str)) _pholder = str; }
+    Placeholder(const std::string str) 
+    { 
+      if (is_placeholder(str)) _pholder = str; 
+      else throw Error("'" + str + "' is not a placeholder! It should begin with '_'!");
+    }
 
     friend std::ostream& operator<< (std::ostream& os, const Placeholder &pholder)
     {
