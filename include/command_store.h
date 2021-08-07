@@ -13,12 +13,11 @@ class UserCmd : public Command
   public:
     UserCmd() {}
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &placeholders, 
+	    const std::vector<Placeholder> &placeholders, 
 	    const std::vector<std::shared_ptr<Command>> &cmds) : Command(name, placeholders.size()) 
     { 
       _commands = cmds;
-
-      for (auto &p : placeholders) if (Placeholder::is_placeholder(p)) _placeholders.push_back(p); 
+      _placeholders = placeholders;
     }
 
     void run()

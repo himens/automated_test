@@ -25,7 +25,7 @@ class Placeholder
     std::string to_string() const { return _pholder; }
 
     /* Tell if a string is a placeholder */
-    static bool is_placeholder(const std::string str) { return str.front() == '_'; } 
+    static bool is_placeholder(const std::string str) { return (str.front() == '_' && str.size() > 1); } 
 
   private:
     std::string _pholder;
@@ -36,11 +36,8 @@ class Command
 {
   public:
     Command() {};
-    Command(const std::string name, const size_t n) 
-    { 
-      _args.resize(n);
-      _name = name; 
-    } 
+    Command(const size_t n) { _args.resize(n); }
+    Command(const std::string name, const size_t n) : Command(n) { set_name(name); }
 
     /* Run command*/
     virtual void run() = 0;

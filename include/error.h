@@ -8,7 +8,8 @@
 
 
 /* Custom exception */
-class Error : public std::exception {
+class Error : public std::exception 
+{
   public:
     Error() {}
     Error(const char* msg) { set_msg(msg); }

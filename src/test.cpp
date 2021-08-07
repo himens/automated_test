@@ -121,23 +121,26 @@ void Test::parse_test(const std::string filename)
       }
 
       auto usr_cmd_name = Utils::first(sect_args);
-      auto placeholders = Utils::remove_first(sect_args);
+      auto usr_cmd_args = Utils::remove_first(sect_args);
 
       if (_user_command_map.count("\\" + usr_cmd_name) > 0)
       {
         throw Error("'\\define_cmd': user command '" + usr_cmd_name + "' already defined!"); 
       }
 
-      for (auto &p : placeholders) 
+      for (auto &arg : usr_cmd_args) 
       {
-	if (!Placeholder::is_placeholder(p)) 
+	if (!Placeholder::is_placeholder(arg)) 
 	{
-	  throw Error("'\\define_cmd': placeholder '" + p + "' should begin with '_'!"); 
+	  throw Error("'\\define_cmd': placeholder '" + arg + "' should begin with '_'!"); 
 	}
       }
 
-      bool end_section_found = false;
       std::vector<std::shared_ptr<Command>> commands = {};
+      std::vector<Placeholder> placeholders = {};
+      for (auto &arg : usr_cmd_args) placeholders.push_back(arg);
+
+      bool end_section_found = false;
 
       /* Parse body */ 
       while (std::getline(file, line))
