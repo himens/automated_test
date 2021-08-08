@@ -9,8 +9,9 @@ void Test::run()
 
   for (auto cmd : _commands)
   {
-    std::cout << "\nRunning test: '" << cmd->get_name() << "'\n";
+    std::cout << "Running test: '" << cmd->get_name() << "'\n";
     cmd->run();
+    std::cout << "\n";
   }
   
   print_banner("Test done!");
@@ -22,7 +23,7 @@ void Test::run()
 /****************/
 void Test::print_banner(const std::string str, size_t length)
 {
-  if (length == 0) length = str.size() + 10;
+  if (length == 0) length = str.size() + 2;
 
   std::cout << "\n";
   std::cout << std::string(length, '*') << "\n";
@@ -82,8 +83,8 @@ void Test::parse_test(const std::string filename)
     auto section = Utils::first( Utils::tokens(line) );
     auto sect_args = Utils::remove_first( Utils::tokens(line) );
 
-    /* '\begin_step' section */
-    if (section == "\\begin_step")
+    /* '\step' section */
+    if (section == "\\step")
     {
       bool end_section_found = false;
 
@@ -112,8 +113,8 @@ void Test::parse_test(const std::string filename)
       }
     }
 
-    /* '\define_cmd' section */
-    else if (section ==  "\\define_cmd")
+    /* '\user_cmd' section */
+    else if (section ==  "\\user_cmd")
     {
       if (sect_args.size() == 0)
       {

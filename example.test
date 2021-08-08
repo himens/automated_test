@@ -1,12 +1,12 @@
 # This is an example test 
 \include my_commands.test 
 
-\define_cmd test2 _x
+\user_cmd test2 _x
 	\test 1 _x
 	\check 1.2 1.211
 \end
 
-\begin_step
+\step example
 	\test2 1
 	\test 999 1000
 \end
