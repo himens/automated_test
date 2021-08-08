@@ -1,8 +1,10 @@
 # This is an example test 
 \include my_commands.test 
 
+\var var1 := 18
+
 \user_cmd test2 _x
-	\test 1 _x
+	\test $var1 _x
 	\check 1.2 1.211
 \end
 
@@ -10,7 +12,3 @@
 	\test2 1
 	\test 999 1000
 \end
-
-#\begin_step
-#	\do_action set_thrust 999
-#\end

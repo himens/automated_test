@@ -9,7 +9,7 @@ void Test::run()
 
   for (auto cmd : _commands)
   {
-    std::cout << "Running test: '" << cmd->get_name() << "'\n";
+    std::cout << "Run command: '" << cmd->get_name() << "'\n";
     cmd->run();
     std::cout << "\n";
   }
@@ -51,11 +51,11 @@ void Test::parse_test(const std::string filename)
     if (line == "\\end" || is_comment(line)) return; // if comment or end section, it's ok
 
     auto num_tabs = std::count(line.begin(), line.end(), '\t'); // require 1-tab indentation
-    if (!num_tabs) throw Error("Line '" + line + "' not indented (tab missing)!");
-    if (num_tabs > 1) throw Error("Line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
+    if (!num_tabs) throw SyntaxError("line '" + line + "' not indented (tab missing)!");
+    if (num_tabs > 1) throw SyntaxError("line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
 
     line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // body lines should begin with '\\'
-    if (line.front() != '\\') throw Error("Line '" + line + "' should begin with '\\'!");
+    if (line.front() != '\\') throw SyntaxError("line '" + line + "' should begin with '\\'!");
   };
 
   // utility function: check end section in line
@@ -63,6 +63,22 @@ void Test::parse_test(const std::string filename)
   {
     auto tokens = Utils::tokens(line);
     return tokens.size() == 1 && tokens.front() == "\\end";
+  };
+
+  // replace variables
+  auto replace_variables = [&](std::vector<std::string> args)
+  {
+    for (auto &arg : args) // check if variable has been defined
+      if (Variable::is_tagged(arg)) 
+	if (std::none_of(_variables.begin(), _variables.end(), 
+	      [&] (std::pair<Variable, std::string> p) { return p.first == Variable(arg); }))
+	    throw Error("variable '" + arg + "' not defined!");
+
+    for (auto &var : _variables)
+      for (auto &arg : args) 
+	if (var.first.to_string() == arg) arg = var.second;
+
+    return args;
   };
   
   print_banner("Read file: " + filename);
@@ -102,14 +118,14 @@ void Test::parse_test(const std::string filename)
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  cmd->set_args(cmd_args);
+	  cmd->set_args( replace_variables(cmd_args) );
 	  _commands.push_back(cmd);
 	}
       } 
 
       if (!end_section_found) 
       {
-	throw Error("Cannot find '\\end' of '" + section + "' section!"); 
+	throw SyntaxError("Cannot find '\\end' of '" + section + "'!"); 
       }
     }
 
@@ -118,22 +134,22 @@ void Test::parse_test(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	throw Error("'\\define_cmd': missing command name!");
+	throw SyntaxError("'" + line + "' missing command name!");
       }
 
-      auto usr_cmd_name = Utils::first(sect_args);
+      auto usr_cmd_name = sect_args[0];
       auto usr_cmd_args = Utils::remove_first(sect_args);
 
       if (_user_command_map.count("\\" + usr_cmd_name) > 0)
       {
-        throw Error("'\\define_cmd': user command '" + usr_cmd_name + "' already defined!"); 
+        throw Error("user command '" + usr_cmd_name + "' already defined!"); 
       }
 
       for (auto &arg : usr_cmd_args) 
       {
-        if (!Placeholder::is_placeholder(arg)) 
+        if (!Placeholder::is_tagged(arg)) 
         {
-          throw Error("'\\define_cmd': '" + arg + "' should be a placeholder! Try: '_" + arg + "'!"); 
+          throw SyntaxError("'" + line + "' missing placeholder! Try: '_" + arg + "'!"); 
         }
       }
 
@@ -157,30 +173,48 @@ void Test::parse_test(const std::string filename)
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  cmd->set_args(cmd_args);
+	  cmd->set_args( replace_variables(cmd_args) );
 	  commands.push_back(cmd);
 	}
       } 
       
       if (!end_section_found) 
       {
-	throw Error("Cannot find '\\end' of '" + section + "' section!"); 
+	throw SyntaxError("Cannot find '\\end' of '" + section + "'!"); 
       }
 
       _user_command_map["\\" + usr_cmd_name] = {usr_cmd_name, placeholders, commands};
     }
 	
-    /* '\\include' section */
+    /* '\include' section */
     else if (section == "\\include")
     {
       if (sect_args.size() == 0)
       {
-	throw Error("\\include': missing filename!");
+	throw SyntaxError("'" + line + "' missing filename!");
       }	
 
       parse_test(sect_args[0]); // recursive parsing
     }
     
+    /* '\var' section */
+    else if (section == "\\var")
+    {
+      if (sect_args.size() != 3)
+      {
+	throw SyntaxError("'" + line + "' missing arguments!");
+      }
+
+      if (sect_args[1] != ":=") 
+      {
+	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
+      }
+
+      auto var_name = sect_args[0];
+      auto var_value = sect_args[2];
+      _variables.push_back({"$" + var_name, var_value});
+    }
+
     /* Unknown section */
     else 
     {

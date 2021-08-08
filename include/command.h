@@ -9,32 +9,6 @@
 
 #include "error.h"
 
-/* Placeholder class: it's a std::string starting with "_" */
-class Placeholder
-{
-  public:
-    Placeholder(const std::string str) 
-    { 
-      if (is_placeholder(str)) _pholder = str; 
-      else throw Error("'" + str + "' is not a placeholder! It should begin with '_'!");
-    }
-
-    friend std::ostream& operator<< (std::ostream& os, const Placeholder &pholder)
-    {
-      os << pholder.to_string();
-      return os;
-    }
-
-    /* Convert to std::string */
-    std::string to_string() const { return _pholder; }
-
-    /* Tell if a string is a placeholder */
-    static bool is_placeholder(const std::string str) { return (str.front() == '_' && str.size() > 1); } 
-
-  private:
-    std::string _pholder;
-};
-
 /* Command class: it stores command name + its args */
 class Command
 {
@@ -47,19 +21,19 @@ class Command
     virtual void run() = 0;
 
     /* Set/get */
+    const std::vector<std::string> &get_args() const { return _args; }
     void set_args(const std::vector<std::string> &args)
     {
       if (args.size() == _args.size()) _args = args;
       else 
       {
-	throw Error("Command '" + _name + "' needs " + std::to_string(_args.size()) + 
-	    	    " arguments, " + std::to_string(args.size()) + " provided!");
+	throw SyntaxError("Command '" + _name + "' needs " + std::to_string(_args.size()) + 
+	    	    	  " arguments, " + std::to_string(args.size()) + " provided!");
       }
     }
-    const std::vector<std::string> &get_args() const { return _args; }
 
-    void set_name(const std::string name) { _name = name; }
     std::string get_name() const { return _name; }
+    void set_name(const std::string name) { _name = name; }
 
   private:
     std::string _name;

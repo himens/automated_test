@@ -3,6 +3,7 @@
 
 #include "command.h"
 #include "utils.h"
+#include "tagged_string.h"
 
 /* UserCmd class: define a user-command which is a set of already existing commands 
    plus placeholders which stands for numeric arguments to be passed when called. 
@@ -23,7 +24,7 @@ class UserCmd : public Command
     void run()
     {
       // replace placeholders 
-      auto replace = [&](std::vector<std::string> args)
+      auto replace_placeholders = [&](std::vector<std::string> args)
       {
 	for (size_t i = 0; i < _placeholders.size(); i++)
 	  for (auto &arg : args) 
@@ -35,7 +36,7 @@ class UserCmd : public Command
       for (auto cmd : _commands) 
       {
 	auto args = cmd->get_args();
-	cmd->set_args(replace(args));
+	cmd->set_args( replace_placeholders(args) );
 	cmd->run();
 	cmd->set_args(args);
       }

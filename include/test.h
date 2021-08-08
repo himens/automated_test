@@ -39,5 +39,6 @@ class Test
 
     std::vector<std::shared_ptr<Command>> _commands = {};
     std::map<std::string, UserCmd> _user_command_map = {};
+    std::vector<std::pair<Variable, std::string>> _variables = {};
 };
 #endif
