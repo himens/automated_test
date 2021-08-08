@@ -27,8 +27,8 @@ class Command
       if (args.size() == _args.size()) _args = args;
       else 
       {
-	throw SyntaxError("Command '" + _name + "' needs " + std::to_string(_args.size()) + 
-	    	    	  " arguments, " + std::to_string(args.size()) + " provided!");
+	throw Error("command '" + _name + "' needs " + std::to_string(_args.size()) + 
+	    	   " arguments, " + std::to_string(args.size()) + " provided!");
       }
     }
 

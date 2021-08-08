@@ -63,7 +63,7 @@ class CheckCmd : public Command
       else if (!Utils::is_digit(a) && !Utils::is_digit(b)) passed = a == b;
       else 
       {
-	throw Error("CheckCmd: Checking data of different types!");
+	throw Error("CheckCmd: checking data of different types!");
       }
 
       std::cout << "check(): " << (passed ? "PASSED" : "FAILED") << std::endl;
@@ -82,7 +82,7 @@ class SetThrustCmd : public Command
       int thrust = Utils::is_digit(value) ? std::stoi(value) : 0;
       if (!Utils::is_digit(value)) 
       {
-	throw Error("SetThrustCmd: Value '" + value + "' is not a number!");
+	throw Error("SetThrustCmd: value '" + value + "' is not a number!");
       }
 
       std::cout << "set_thrust(): thrust set to " << thrust << "\n"; 

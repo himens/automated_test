@@ -87,7 +87,7 @@ void Test::parse_test(const std::string filename)
   std::ifstream file(filename, std::ios::in);
   if (!file.good()) 
   {
-    throw Error("Cannot open file '" + filename + "'");
+    throw Error("cannot open file '" + filename + "'");
   }
 
   /* Parse file */
@@ -125,7 +125,7 @@ void Test::parse_test(const std::string filename)
 
       if (!end_section_found) 
       {
-	throw SyntaxError("Cannot find '\\end' of '" + section + "'!"); 
+	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
     }
 
@@ -180,7 +180,7 @@ void Test::parse_test(const std::string filename)
       
       if (!end_section_found) 
       {
-	throw SyntaxError("Cannot find '\\end' of '" + section + "'!"); 
+	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
 
       _user_command_map["\\" + usr_cmd_name] = {usr_cmd_name, placeholders, commands};
@@ -218,7 +218,7 @@ void Test::parse_test(const std::string filename)
     /* Unknown section */
     else 
     {
-      throw Error("Unknown section '" + section + "'!");
+      throw Error("unknown section '" + section + "'!");
     }	
   } // end parse file
 }
