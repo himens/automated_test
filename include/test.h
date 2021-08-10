@@ -3,6 +3,7 @@
 
 #include "utils.h"
 #include "command_store.h"
+#include "variable.h"
 
 class Test 
 {
@@ -21,9 +22,9 @@ class Test
     {
       std::shared_ptr<Command> cmd = nullptr;
 
-      if (name == "\\set_thrust") cmd = std::make_shared<SetThrustCmd>();
-      else if (name == "\\insert_pds") cmd = std::make_shared<InsertPdsCmd>();
-      else if (name == "\\check") cmd = std::make_shared<CheckCmd>();
+      if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
+      else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
+      else if (name == "check") cmd = std::make_shared<CheckCmd>();
       else if (_user_command_map.count(name) > 0) cmd = std::make_shared<UserCmd>(_user_command_map[name]);
       else 
       {
@@ -39,6 +40,6 @@ class Test
 
     std::vector<std::shared_ptr<Command>> _commands = {};
     std::map<std::string, UserCmd> _user_command_map = {};
-    std::vector<std::pair<Variable, std::string>> _variables = {};
+    std::map<std::string, std::shared_ptr<Variable>> _variables = {};
 };
 #endif

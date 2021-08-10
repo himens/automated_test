@@ -1,50 +1,46 @@
 #include "utils.h"
 
-namespace Utils
-{
-  /********************************/
-  /* Tell if string is alphabetic */
-  /********************************/
-  bool is_alphabetic(const std::string str)
+  namespace Utils
   {
-    return !str.empty() && std::all_of(str.begin(), str.end(), ::isalpha);
-  };
+    /********************************/
+    /* Tell if string is alphabetic */
+    /********************************/
+    bool is_alphabetic(const std::string str)
+    {
+      return !str.empty() && std::all_of(str.begin(), str.end(), ::isalpha);
+    };
 
 
-  /***************************/
-  /* Tell if string is digit */
-  /***************************/
-  bool is_digit(const std::string str)
-  {
-    return !str.empty() && (str.find_first_not_of("0123456789.") == std::string::npos);
-  }; 
+    /***************************/
+    /* Tell if string is digit */
+    /***************************/
+    bool is_digit(const std::string str)
+    {
+      return !str.empty() && (str.find_first_not_of("0123456789.") == std::string::npos);
+    }; 
 
 
-  /*****************/
-  /* Tokenize line */
-  /*****************/
-  std::vector<std::string> tokens(std::string line, const char delim) 
-  {
-    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
+    /*****************/
+    /* Tokenize line */
+    /*****************/
+    std::vector<std::string> tokens(std::string line, const char delim) 
+    {
+      std::vector<std::string> tokens;
+      std::string token;
+      std::istringstream iss(line);
 
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream iss(line);
-
-    while (std::getline(iss, token, delim)) tokens.push_back(token);
+      while (std::getline(iss, token, delim)) tokens.push_back(token);
 
     return tokens;
   };
 
-
-  /*******************/
-  /* Get first token */
-  /*******************/
-  std::string first(const std::vector<std::string> &tokens)
+  /*******************************************/
+  /* Remove all char occurrences from string */
+  /*******************************************/
+  void strip_char(const char c, std::string &str)
   {
-    return (tokens.size() != 0 ? tokens.front() : "");
+    str.erase(std::remove(str.begin(), str.end(), c), str.end()); 
   };
-
 
   /***********************************/
   /* Get all tokens except first one */

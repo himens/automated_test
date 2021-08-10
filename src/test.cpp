@@ -10,6 +10,7 @@ void Test::run()
   for (auto cmd : _commands)
   {
     std::cout << "Run command: '" << cmd->get_name() << "'\n";
+    auto args = cmd->get_args();
     cmd->run();
     std::cout << "\n";
   }
@@ -37,50 +38,57 @@ void Test::print_banner(const std::string str, size_t length)
 /*******************/
 void Test::parse_test(const std::string filename)
 {
-  // utility function: skip lines
-  auto is_comment = [](std::string line)
+  // utility function: strip comment from line
+  auto strip_comment = [] (std::string &line)
   {
-    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // remove tabs
-
-    return line.empty() || line.front() == '#'; // skip line with comment or empty
+    line = line.substr(0, line.find('#')); 
   };
 
-  // utility function: check if line is indented
-  auto check_formatting = [&](std::string line)
+  // utility function: tell if line is comment
+  auto is_comment = [&] (std::string line)
   {
-    if (line == "\\end" || is_comment(line)) return; // if comment or end section, it's ok
+    strip_comment(line); 
+    Utils::strip_char('\t', line);
+    Utils::strip_char(' ', line);
 
-    auto num_tabs = std::count(line.begin(), line.end(), '\t'); // require 1-tab indentation
-    if (!num_tabs) throw SyntaxError("line '" + line + "' not indented (tab missing)!");
-    if (num_tabs > 1) throw SyntaxError("line '" + line + "' not indented (" + std::to_string(num_tabs) + " tabs)!");
-
-    line.erase(std::remove(line.begin(), line.end(), '\t'), line.end()); // body lines should begin with '\\'
-    if (line.front() != '\\') throw SyntaxError("line '" + line + "' should begin with '\\'!");
+    return line.length() == 0;
   };
 
   // utility function: check end section in line
-  auto is_end_section = [] (const std::string line)
+  auto is_end_of_section = [] (const std::string line)
   {
     auto tokens = Utils::tokens(line);
     return tokens.size() == 1 && tokens.front() == "\\end";
   };
 
-  // replace variables
-  auto replace_variables = [&](std::vector<std::string> args)
+  // utility function: check if body line is formatted
+  auto check_body_indent = [&] (const std::string line)
   {
-    for (auto &arg : args) // check if variable has been defined
-      if (Variable::is_tagged(arg)) 
-	if (std::none_of(_variables.begin(), _variables.end(), 
-	      [&] (std::pair<Variable, std::string> p) { return p.first == Variable(arg); }))
-	    throw Error("variable '" + arg + "' not defined!");
+    if (is_end_of_section(line) || is_comment(line)) return; // skip comment and end of section 
 
-    for (auto &var : _variables)
-      for (auto &arg : args) 
-	if (var.first.to_string() == arg) arg = var.second;
-
-    return args;
+    auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
+    if (!tabs) throw SyntaxError("line '" + line + "' not indented (tab missing)!");
+    else if (tabs > 1) throw SyntaxError("line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
   };
-  
+
+  // utility function: replace variables
+  auto replace_variables = [&] (std::vector<std::string> &args)
+  {
+    for (auto &arg : args) 
+    {
+      if (arg.front() == '$') 
+      {
+	Utils::strip_char('$', arg);
+
+	if (_variables.count(arg) > 0) arg = _variables[arg]->get_value();
+	else 
+	{
+	  throw SyntaxError("variable '" + arg + "' not defined!");
+	}
+      }
+    }
+  };
+
   print_banner("Read file: " + filename);
 
   /* Open file */
@@ -94,36 +102,50 @@ void Test::parse_test(const std::string filename)
   std::string line;
   while (std::getline(file, line))
   {   
-    if (is_comment(line)) continue;
+    if (line.empty() || is_comment(line)) continue;
 
-    auto section = Utils::first( Utils::tokens(line) );
-    auto sect_args = Utils::remove_first( Utils::tokens(line) );
+    auto tokens = Utils::tokens(line);
+    auto section = tokens[0];
+    auto sect_args = Utils::remove_first(tokens);
 
     /* '\step' section */
     if (section == "\\step")
     {
-      bool end_section_found = false;
+      bool end_of_section_found = false;
 
       /* Parse body */
       while (std::getline(file, line))
       {
-	check_formatting(line);
+	if (line.empty() || is_comment(line)) continue;
 
-	end_section_found = is_end_section(line); 
-	if (end_section_found) break;
-	if (is_comment(line)) continue;
+	end_of_section_found = is_end_of_section(line); 
+	if (end_of_section_found) break;
 
-	auto cmd_name = Utils::first( Utils::tokens(line) );
-	auto cmd_args = Utils::remove_first( Utils::tokens(line) );
+	check_body_indent(line);
+
+	Utils::strip_char('\t', line);
+	strip_comment(line);
+
+	auto tokens = Utils::tokens( line );
+	if (tokens[0].front() != '@')
+	{
+	  throw SyntaxError("'" + line + "' not a command statement!");
+	}
+
+	Utils::strip_char('@', tokens[0]);
+
+	auto cmd_name = tokens[0];
+	auto cmd_args = Utils::remove_first( tokens );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  cmd->set_args( replace_variables(cmd_args) );
+	  replace_variables(cmd_args);
+	  cmd->set_args(cmd_args);
 	  _commands.push_back(cmd);
 	}
       } 
 
-      if (!end_section_found) 
+      if (!end_of_section_found) 
       {
 	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
@@ -138,52 +160,54 @@ void Test::parse_test(const std::string filename)
       }
 
       auto usr_cmd_name = sect_args[0];
-      auto usr_cmd_args = Utils::remove_first(sect_args);
+      auto placeholders = Utils::remove_first(sect_args);
+      std::vector<std::shared_ptr<Command>> commands = {};
 
-      if (_user_command_map.count("\\" + usr_cmd_name) > 0)
+      if (_user_command_map.count(usr_cmd_name) > 0)
       {
         throw Error("user command '" + usr_cmd_name + "' already defined!"); 
       }
 
-      for (auto &arg : usr_cmd_args) 
-      {
-        if (!Placeholder::is_tagged(arg)) 
-        {
-          throw SyntaxError("'" + line + "' missing placeholder! Try: '_" + arg + "'!"); 
-        }
-      }
-
-      std::vector<std::shared_ptr<Command>> commands = {};
-      std::vector<Placeholder> placeholders = {};
-      for (auto &arg : usr_cmd_args) placeholders.push_back(arg);
-
-      bool end_section_found = false;
+      bool end_of_section_found = false;
 
       /* Parse body */ 
       while (std::getline(file, line))
       {
-	check_formatting(line);
+	if (line.empty() || is_comment(line)) continue;
 
-	end_section_found = is_end_section(line); 
-	if (end_section_found) break;
-	if (is_comment(line)) continue;
+	end_of_section_found = is_end_of_section(line); 
+	if (end_of_section_found) break;
 
-	auto cmd_name = Utils::first( Utils::tokens(line) );
-	auto cmd_args = Utils::remove_first( Utils::tokens(line) );
+	check_body_indent(line);
+
+	Utils::strip_char('\t', line);
+	strip_comment(line);
+
+	auto tokens = Utils::tokens(line);
+	if (tokens[0].front() != '@')
+	{
+	  throw SyntaxError("'" + line + "' not a command statement!");
+	}
+
+	Utils::strip_char('@', tokens[0]);
+	
+	auto cmd_name = tokens[0];
+	auto cmd_args = Utils::remove_first(tokens);
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  cmd->set_args( replace_variables(cmd_args) );
+	  replace_variables(cmd_args);
+	  cmd->set_args(cmd_args);
 	  commands.push_back(cmd);
 	}
       } 
       
-      if (!end_section_found) 
+      if (!end_of_section_found) 
       {
 	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
 
-      _user_command_map["\\" + usr_cmd_name] = {usr_cmd_name, placeholders, commands};
+      _user_command_map[usr_cmd_name] = {usr_cmd_name, placeholders, commands};
     }
 	
     /* '\include' section */
@@ -210,17 +234,87 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
       }
 
-      auto var_name = sect_args[0];
-      auto var_value = sect_args[2];
-      _variables.push_back({"$" + var_name, var_value});
+      auto name = sect_args[0];
+      auto value = sect_args[2];
+      auto var = Variable{name, value};
+      _variables[name] = std::make_shared<Variable>(var);
+    }
+
+    /* '\set' section */
+    else if (section == "\\set")
+    {
+      if (sect_args.size() != 3)
+      {
+	throw SyntaxError("'" + line + "' missing arguments!");
+      }
+
+      if (sect_args[1] != ":=") 
+      {
+	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
+      }
+
+      auto name = sect_args[0];
+      auto value = sect_args[2];
+      if (_variables.count(name) > 0) _variables[name]->set_value(value);
+      else
+      {
+	throw SyntaxError("variable '" + name + "' not defined!");
+      }
+    }
+
+    /* '\alias' section */
+    else if (section == "\\alias")
+    {
+      if (sect_args.size() < 3)
+      {
+	throw SyntaxError("'" + line + "' missing arguments!");
+      }
+
+      if (sect_args[1] != ":=") 
+      {
+	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
+      }
+
+      auto alias = sect_args[0];
+      auto tgt = sect_args[2];
+
+      if (tgt.front() == '$') // alias to variable
+      {
+	if (sect_args.size() != 3)
+	{
+	  throw SyntaxError("Too many arguments specified for alias to variable: '" + line + "'!");
+	}
+
+	Utils::strip_char('$', tgt);
+
+	if (_variables.count(tgt) > 0)  _variables[alias] = _variables[tgt];
+	else
+	{
+	  throw SyntaxError("'" + line + "' points to unknown variable!");
+	}
+      }
+
+      else if (tgt.front() == '@') // alias to command
+      {
+	Utils::strip_char('@', tgt);
+
+	auto cmd = get_command(tgt);
+	if (cmd) 
+	{
+	  UserCmd* ptr = static_cast<UserCmd*>(cmd.get());
+	  _user_command_map[alias] = *ptr;
+	}
+      }
     }
 
     /* Unknown section */
     else 
     {
-      throw Error("unknown section '" + section + "'!");
+      throw SyntaxError("unknown section '" + section + "'!");
     }	
   } // end parse file
+
+  std::cout << "File: " + filename + " read successfully! \n";
 }
 
 

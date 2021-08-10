@@ -3,12 +3,17 @@
 
 \var var1 := 18
 
+\alias pp_accept := @test
+
+\alias var2 := $var1
+\set var2 := 1000
+
 \user_cmd test2 _x
-	\test $var1 _x
-	\check 1.2 1.211
+	@test $var2 _x 
+	@check 1.2 1.211
 \end
 
 \step example
-	\test2 1
-	\test 999 1000
+	@test2 1 
+	@test 999 1000
 \end

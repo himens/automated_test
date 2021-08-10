@@ -25,11 +25,11 @@ namespace Utils
   /* Tokenize line */
   std::vector<std::string> tokens(std::string line, const char delim = ' '); 
   
-  /* Get first token */
-  std::string first(const std::vector<std::string> &tokens);
-
   /* Get all tokens except first one */
   std::vector<std::string> remove_first(const std::vector<std::string> &tokens);
+  
+  /* Remove all char occurrences from string */
+  void strip_char(const char c, std::string &str);
 
   /* Convert expression from infix to postfix */
   std::string to_postfix(const std::string infix);

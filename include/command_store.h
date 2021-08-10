@@ -3,7 +3,6 @@
 
 #include "command.h"
 #include "utils.h"
-#include "tagged_string.h"
 
 /* UserCmd class: define a user-command which is a set of already existing commands 
    plus placeholders which stands for numeric arguments to be passed when called. 
@@ -14,37 +13,55 @@ class UserCmd : public Command
   public:
     UserCmd() {}
     UserCmd(const std::string name, 
-	    const std::vector<Placeholder> &placeholders, 
-	    const std::vector<std::shared_ptr<Command>> &cmds) : Command(name, placeholders.size()) 
+	    const std::vector<std::string> &placeholders, 
+	    const std::vector<std::shared_ptr<Command>> &commands) : Command(name, placeholders.size()) 
     { 
-      _commands = cmds;
-      _placeholders = placeholders;
+      set_placeholders(placeholders);
+      set_commands(commands);
     }
 
     void run()
     {
       // replace placeholders 
-      auto replace_placeholders = [&](std::vector<std::string> args)
+      auto replace_placeholders = [&](std::vector<std::string> &args)
       {
 	for (size_t i = 0; i < _placeholders.size(); i++)
 	  for (auto &arg : args) 
-	    if (_placeholders[i].to_string() == arg) arg = this->get_args().at(i);
-
-	return args;
+	    if (_placeholders[i] == arg) arg = this->get_args().at(i);
       };
 
       for (auto cmd : _commands) 
       {
+	auto old_args = cmd->get_args();
 	auto args = cmd->get_args();
-	cmd->set_args( replace_placeholders(args) );
-	cmd->run();
+	replace_placeholders(args);
+
 	cmd->set_args(args);
+	cmd->run();
+	cmd->set_args(old_args);
       }
     }
     
+    /* Set/get */
+    void set_commands(const std::vector<std::shared_ptr<Command>> &commands) { _commands = commands; }
+    
+    void set_placeholders(const std::vector<std::string> &placeholders) 
+    { 
+      auto it = std::find_if(placeholders.begin(), placeholders.end(), [] (std::string s) { return s.front() != '_'; });
+      if (it != placeholders.end()) 
+      {
+	throw Error("UserCmd::set_placeholders: '" + *it + "' not a placeholder! It should begin with '_'!");
+      }
+
+      _placeholders = placeholders;
+    }
+    
+    const std::vector<std::shared_ptr<Command>> get_commands() const { return _commands; }
+    const std::vector<std::string> get_placeholders() const { return _placeholders; }
+
   private:
     std::vector<std::shared_ptr<Command>> _commands;
-    std::vector<Placeholder> _placeholders;
+    std::vector<std::string> _placeholders;
 };
 
 /* Check command */
