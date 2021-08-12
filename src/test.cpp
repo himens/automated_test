@@ -207,7 +207,6 @@ void Test::parse_test(const std::string filename)
       }
 
       _user_command_map[usr_cmd_name] = std::make_shared<UserCmd>(usr_cmd_name, placeholders, commands);
-      //_user_command_map[usr_cmd_name] = {usr_cmd_name, placeholders, commands};
     }
 	
     /* '\include' section */
@@ -303,11 +302,18 @@ void Test::parse_test(const std::string filename)
       {
 	Utils::strip_char('@', tgt);
 
-	auto cmd = get_command(tgt);
-	if (cmd)
-	{ 
-	  _user_command_map[alias] = cmd;
-	  _user_command_map[alias]->set_name(alias);
+	if (_user_command_map.count(tgt) > 0) 
+	{
+	  auto cmd = get_command(tgt);
+	  if (cmd)
+	  { 
+	    _user_command_map[alias] = cmd;
+	    _user_command_map[alias]->set_name(alias);
+	  }
+	}
+	else 
+	{
+	  throw SyntaxError("'" + line + "' points to unknown command!");
 	}
       }
     }
