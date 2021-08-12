@@ -9,8 +9,7 @@ void Test::run()
 
   for (auto cmd : _commands)
   {
-    std::cout << "Run command: '" << cmd->get_name() << "'\n";
-    auto args = cmd->get_args();
+    std::cout << "Run '" << cmd->get_name() << "': \n";
     cmd->run();
     std::cout << "\n";
   }
@@ -207,7 +206,8 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
 
-      _user_command_map[usr_cmd_name] = {usr_cmd_name, placeholders, commands};
+      _user_command_map[usr_cmd_name] = std::make_shared<UserCmd>(usr_cmd_name, placeholders, commands);
+      //_user_command_map[usr_cmd_name] = {usr_cmd_name, placeholders, commands};
     }
 	
     /* '\include' section */
@@ -236,8 +236,7 @@ void Test::parse_test(const std::string filename)
 
       auto name = sect_args[0];
       auto value = sect_args[2];
-      auto var = Variable{name, value};
-      _variables[name] = std::make_shared<Variable>(var);
+      _variables[name] = std::make_shared<Variable>(name, value);
     }
 
     /* '\set' section */
@@ -255,7 +254,10 @@ void Test::parse_test(const std::string filename)
 
       auto name = sect_args[0];
       auto value = sect_args[2];
-      if (_variables.count(name) > 0) _variables[name]->set_value(value);
+      if (_variables.count(name) > 0) 
+      {
+	_variables[name]->set_value(value);
+      }
       else
       {
 	throw SyntaxError("variable '" + name + "' not defined!");
@@ -287,7 +289,10 @@ void Test::parse_test(const std::string filename)
 
 	Utils::strip_char('$', tgt);
 
-	if (_variables.count(tgt) > 0)  _variables[alias] = _variables[tgt];
+	if (_variables.count(tgt) > 0) 
+	{
+	  _variables[alias] = _variables[tgt];
+	}
 	else
 	{
 	  throw SyntaxError("'" + line + "' points to unknown variable!");
@@ -299,10 +304,10 @@ void Test::parse_test(const std::string filename)
 	Utils::strip_char('@', tgt);
 
 	auto cmd = get_command(tgt);
-	if (cmd) 
-	{
-	  UserCmd* ptr = static_cast<UserCmd*>(cmd.get());
-	  _user_command_map[alias] = *ptr;
+	if (cmd)
+	{ 
+	  _user_command_map[alias] = cmd;
+	  _user_command_map[alias]->set_name(alias);
 	}
       }
     }

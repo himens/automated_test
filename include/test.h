@@ -25,7 +25,11 @@ class Test
       if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
       else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
       else if (name == "check") cmd = std::make_shared<CheckCmd>();
-      else if (_user_command_map.count(name) > 0) cmd = std::make_shared<UserCmd>(_user_command_map[name]);
+      else if (_user_command_map.count(name) > 0) 
+      {
+	auto usr_cmd = std::static_pointer_cast<UserCmd>(_user_command_map[name]);
+	cmd = std::make_shared<UserCmd>(*usr_cmd);
+      }
       else 
       {
 	throw Error("Unknown command '" + name + "'!");
@@ -39,7 +43,7 @@ class Test
     void print_banner(const std::string, size_t length = 0);
 
     std::vector<std::shared_ptr<Command>> _commands = {};
-    std::map<std::string, UserCmd> _user_command_map = {};
+    std::map<std::string, std::shared_ptr<Command>> _user_command_map = {};
     std::map<std::string, std::shared_ptr<Variable>> _variables = {};
 };
 #endif

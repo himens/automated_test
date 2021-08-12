@@ -33,7 +33,7 @@ class UserCmd : public Command
       for (auto cmd : _commands) 
       {
 	auto old_args = cmd->get_args();
-	auto args = cmd->get_args();
+	auto args = cmd->get_args(); 
 	replace_placeholders(args);
 
 	cmd->set_args(args);
