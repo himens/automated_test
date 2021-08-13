@@ -4,6 +4,7 @@
 \var var1 := 18
 
 \alias my_alias := @test
+\alias my_alias2 := @set_thrust
 
 \alias var2 := $var1
 \set var2 := 77
@@ -17,4 +18,5 @@
 	@test2 10
 	@test 999 1000
 	@my_alias 1 2
+	@my_alias2 1 
 \end

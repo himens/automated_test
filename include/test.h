@@ -18,18 +18,23 @@ class Test
     void run();
 
     /* Get command */
-    std::shared_ptr<Command> get_command(const std::string name)
+    std::shared_ptr<Command> get_command(std::string name)
     {
       std::shared_ptr<Command> cmd = nullptr;
+
+      if (_alias_to_tgt_map.count(name) > 0) 
+      {
+	auto tgt = _alias_to_tgt_map[name];
+	if (tgt.front() == '@') name = tgt.substr(1);
+      }
+
+      auto it = std::find_if(_usr_commands.begin(), _usr_commands.end(), 
+	  [&] (UserCmd cmd) { return name == cmd.get_name(); });
 
       if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
       else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
       else if (name == "check") cmd = std::make_shared<CheckCmd>();
-      else if (_user_command_map.count(name) > 0) 
-      {
-	auto usr_cmd = std::static_pointer_cast<UserCmd>(_user_command_map[name]);
-	cmd = std::make_shared<UserCmd>(*usr_cmd);
-      }
+      else if (it != _usr_commands.end()) cmd = std::make_shared<UserCmd>(*it);
       else 
       {
 	throw Error("Unknown command '" + name + "'!");
@@ -43,7 +48,8 @@ class Test
     void print_banner(const std::string, size_t length = 0);
 
     std::vector<std::shared_ptr<Command>> _commands = {};
-    std::map<std::string, std::shared_ptr<Command>> _user_command_map = {};
-    std::map<std::string, std::shared_ptr<Variable>> _variables = {};
+    std::vector<UserCmd> _usr_commands = {};
+    std::vector<Variable> _variables = {};
+    std::map<std::string, std::string> _alias_to_tgt_map = {};
 };
 #endif
