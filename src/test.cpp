@@ -80,18 +80,18 @@ void Test::parse_test(const std::string filename)
   // utility function: resolve alias
   auto replace_alias_with_tgt = [&] (const std::string alias)
   {
+    auto alias_name = alias.substr(1);
     auto tgt = alias;
-    auto name = alias.substr(1);
 
     if (alias.front() == '$' || alias.front() == '@') 
     {
-      if (_alias_to_tgt_map.count(name) > 0) 
+      if (_alias_to_tgt_map.count(alias_name) > 0) 
       {
-	if (tgt.front() == alias.front()) tgt = _alias_to_tgt_map[name];
+	if (_alias_to_tgt_map[alias_name].front() == alias.front()) tgt = _alias_to_tgt_map[alias_name];
       }
     }
 
-    return tgt.substr(1);
+    return tgt;
   };
 
   // utility function: replace variables
@@ -103,7 +103,8 @@ void Test::parse_test(const std::string filename)
     {
       if (arg.front() == '$') 
       {
-	auto it = std::find(_variables.begin(), _variables.end(), Variable{replace_alias_with_tgt(arg)});
+	auto var_name = replace_alias_with_tgt(arg).substr(1);
+	auto it = std::find(_variables.begin(), _variables.end(), Variable{var_name});
 	if (it != _variables.end()) 
 	{
 	  arg = it->get_value();
@@ -135,7 +136,7 @@ void Test::parse_test(const std::string filename)
 
     auto tokens = Utils::tokens(line);
     auto section = tokens[0];
-    auto sect_args = Utils::remove_first(tokens);
+    auto sect_args = Utils::remove_first_token(tokens);
 
     /* '\step' section */
     if (section == "\\step")
@@ -161,8 +162,8 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = replace_alias_with_tgt(tokens[0]);
-	auto cmd_args = Utils::remove_first( tokens );
+	auto cmd_name = replace_alias_with_tgt(tokens[0]).substr(1);
+	auto cmd_args = Utils::remove_first_token( tokens );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
@@ -186,7 +187,7 @@ void Test::parse_test(const std::string filename)
       }
 
       auto usr_cmd_name = sect_args[0];
-      auto placeholders = Utils::remove_first(sect_args);
+      auto placeholders = Utils::remove_first_token(sect_args);
       std::vector<std::shared_ptr<Command>> commands = {};
 
       if (std::find_if(_usr_commands.begin(), _usr_commands.end(), 
@@ -216,8 +217,8 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = replace_alias_with_tgt(tokens[0]);
-	auto cmd_args = Utils::remove_first(tokens);
+	auto cmd_name = replace_alias_with_tgt(tokens[0]).substr(1);
+	auto cmd_args = Utils::remove_first_token(tokens);
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
@@ -276,7 +277,7 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
       }
 
-      auto name = replace_alias_with_tgt("$" + sect_args[0]);
+      auto name = replace_alias_with_tgt("$" + sect_args[0]).substr(1);
       auto value = sect_args[2];
 
       auto it = std::find(_variables.begin(), _variables.end(), Variable{name});
@@ -313,7 +314,8 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("Too many arguments specified for alias to variable: '" + line + "'!");
 	}
 
-	auto it = std::find(_variables.begin(), _variables.end(), Variable{tgt.substr(1)});
+	auto tgt_name = tgt.substr(1);
+	auto it = std::find(_variables.begin(), _variables.end(), Variable{tgt_name});
 	if (it != _variables.end()) 
 	{
 	  _alias_to_tgt_map[alias] = tgt;
@@ -326,7 +328,8 @@ void Test::parse_test(const std::string filename)
 
       else if (tgt.front() == '@') // alias to command
       {
-	auto cmd = get_command(tgt.substr(1));
+	auto cmd_name = tgt.substr(1);
+	auto cmd = get_command(cmd_name);
 	if (cmd)
 	{ 
 	  _alias_to_tgt_map[alias] = tgt;

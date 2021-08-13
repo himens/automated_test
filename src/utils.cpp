@@ -45,7 +45,7 @@
   /***********************************/
   /* Get all tokens except first one */
   /***********************************/
-  std::vector<std::string> remove_first(const std::vector<std::string> &tokens)
+  std::vector<std::string> remove_first_token(const std::vector<std::string> &tokens)
   {
     auto args = tokens;
     if (tokens.size() > 1) args.erase(args.begin());
