@@ -23,22 +23,27 @@ class UserCmd : public Command
     void run()
     {
       // replace placeholders 
-      auto replace_placeholders = [&](std::vector<std::string> &args)
+      auto replace_placeholder_with_val = [&](const std::vector<std::string> args)
       {
+	auto args_r = args;
+
 	for (size_t i = 0; i < _placeholders.size(); i++)
-	  for (auto &arg : args) 
+	{
+	  for (auto &arg : args_r) 
+	  {
 	    if (_placeholders[i] == arg) arg = this->get_args().at(i);
+	  }
+	}
+
+	return args_r;
       };
 
       for (auto cmd : _commands) 
       {
-	auto old_args = cmd->get_args();
 	auto args = cmd->get_args(); 
-	replace_placeholders(args);
-
-	cmd->set_args(args);
+	cmd->set_args( replace_placeholder_with_val(args) );
 	cmd->run();
-	cmd->set_args(old_args);
+	cmd->set_args(args);
       }
     }
     

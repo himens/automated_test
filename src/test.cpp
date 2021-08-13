@@ -66,12 +66,19 @@ void Test::parse_test(const std::string filename)
     if (is_end_of_section(line) || is_comment(line)) return; // skip comment and end of section 
 
     auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
-    if (!tabs) throw SyntaxError("line '" + line + "' not indented (tab missing)!");
-    else if (tabs > 1) throw SyntaxError("line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
+
+    if (!tabs) 
+    {
+      throw SyntaxError("line '" + line + "' not indented (tab missing)!");
+    }
+    else if (tabs > 1) 
+    {
+      throw SyntaxError("line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
+    }
   };
 
   // utility function: resolve alias
-  auto resolve_alias = [&] (const std::string alias)
+  auto replace_alias_with_tgt = [&] (const std::string alias)
   {
     auto tgt = alias;
     auto name = alias.substr(1);
@@ -88,15 +95,15 @@ void Test::parse_test(const std::string filename)
   };
 
   // utility function: replace variables
-  auto replace_variables = [&] (std::vector<std::string> &args)
+  auto replace_variable_with_val = [&] (const std::vector<std::string> args)
   {
-    for (auto &arg : args) 
+    auto args_r = args;
+
+    for (auto &arg : args_r) 
     {
       if (arg.front() == '$') 
       {
-	auto var_name = resolve_alias(arg);
-
-	auto it = std::find(_variables.begin(), _variables.end(), Variable{var_name});
+	auto it = std::find(_variables.begin(), _variables.end(), Variable{replace_alias_with_tgt(arg)});
 	if (it != _variables.end()) 
 	{
 	  arg = it->get_value();
@@ -107,6 +114,8 @@ void Test::parse_test(const std::string filename)
 	}
       }
     }
+
+    return args_r;
   };
 
   print_banner("Read file: " + filename);
@@ -152,13 +161,12 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = resolve_alias(tokens[0]);
+	auto cmd_name = replace_alias_with_tgt(tokens[0]);
 	auto cmd_args = Utils::remove_first( tokens );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  replace_variables(cmd_args);
-	  cmd->set_args(cmd_args);
+	  cmd->set_args( replace_variable_with_val(cmd_args) );
 	  _commands.push_back(cmd);
 	}
       } 
@@ -208,13 +216,12 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = resolve_alias(tokens[0]);
+	auto cmd_name = replace_alias_with_tgt(tokens[0]);
 	auto cmd_args = Utils::remove_first(tokens);
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
 	{
-	  replace_variables(cmd_args);
-	  cmd->set_args(cmd_args);
+	  cmd->set_args( replace_variable_with_val(cmd_args) );
 	  commands.push_back(cmd);
 	}
       } 
@@ -269,7 +276,7 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
       }
 
-      auto name = resolve_alias("$" + sect_args[0]);
+      auto name = replace_alias_with_tgt("$" + sect_args[0]);
       auto value = sect_args[2];
 
       auto it = std::find(_variables.begin(), _variables.end(), Variable{name});
