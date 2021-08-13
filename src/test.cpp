@@ -70,6 +70,23 @@ void Test::parse_test(const std::string filename)
     else if (tabs > 1) throw SyntaxError("line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
   };
 
+  // utility function: resolve alias
+  auto resolve_alias = [&] (const std::string alias)
+  {
+    auto tgt = alias;
+    auto name = alias.substr(1);
+
+    if (alias.front() == '$' || alias.front() == '@') 
+    {
+      if (_alias_to_tgt_map.count(name) > 0) 
+      {
+	if (tgt.front() == alias.front()) tgt = _alias_to_tgt_map[name];
+      }
+    }
+
+    return tgt.substr(1);
+  };
+
   // utility function: replace variables
   auto replace_variables = [&] (std::vector<std::string> &args)
   {
@@ -77,13 +94,7 @@ void Test::parse_test(const std::string filename)
     {
       if (arg.front() == '$') 
       {
-	auto var_name = arg.substr(1);
-
-	if (_alias_to_tgt_map.count(var_name) > 0) 
-	{
-	  auto tgt = _alias_to_tgt_map[var_name];
-	  if (tgt.front() == '$') var_name = tgt.substr(1);
-	}
+	auto var_name = resolve_alias(arg);
 
 	auto it = std::find(_variables.begin(), _variables.end(), Variable{var_name});
 	if (it != _variables.end()) 
@@ -141,7 +152,7 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = tokens[0].substr(1);
+	auto cmd_name = resolve_alias(tokens[0]);
 	auto cmd_args = Utils::remove_first( tokens );
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
@@ -197,7 +208,7 @@ void Test::parse_test(const std::string filename)
 	  throw SyntaxError("'" + line + "' not a command statement!");
 	}
 
-	auto cmd_name = tokens[0].substr(1);
+	auto cmd_name = resolve_alias(tokens[0]);
 	auto cmd_args = Utils::remove_first(tokens);
 	auto cmd = get_command(cmd_name);
 	if (cmd) 
@@ -258,14 +269,8 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
       }
 
-      auto name = sect_args[0];
+      auto name = resolve_alias("$" + sect_args[0]);
       auto value = sect_args[2];
-
-      if (_alias_to_tgt_map.count(name) > 0) 
-      {
-	auto tgt = _alias_to_tgt_map[name];
-	if (tgt.front() == '$') name = tgt.substr(1);
-      }
 
       auto it = std::find(_variables.begin(), _variables.end(), Variable{name});
       if (it != _variables.end()) 

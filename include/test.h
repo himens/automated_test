@@ -22,12 +22,6 @@ class Test
     {
       std::shared_ptr<Command> cmd = nullptr;
 
-      if (_alias_to_tgt_map.count(name) > 0) 
-      {
-	auto tgt = _alias_to_tgt_map[name];
-	if (tgt.front() == '@') name = tgt.substr(1);
-      }
-
       auto it = std::find_if(_usr_commands.begin(), _usr_commands.end(), 
 	  [&] (UserCmd cmd) { return name == cmd.get_name(); });
 
