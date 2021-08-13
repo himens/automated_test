@@ -12,10 +12,8 @@ int main()
     std::cout << e.what() << "\n"; 
   }
 
-  //std::string s = "((@ground_speed > 180) && (pp_accept == 1)) || (@config_check == 3)";
-  //auto tokens = Utils::tokens(s, '(');
-  //for (auto &t : tokens) std::cout << t << " - ";
-  //std::cout << "\n";
+  std::string s = "((a > 180) && (b == 1)) || (c == 3)";
+  Utils::eval_logical_expr(s);
 
   return 0;
 }

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include<stack>
 
+#include "error.h"
+
 /***********/
 /* Utils */
 /***********/
@@ -31,7 +33,7 @@ namespace Utils
   /* Remove all char occurrences from string */
   void strip_char(const char c, std::string &str);
 
-  /* Convert expression from infix to postfix */
-  std::string to_postfix(const std::string infix);
+  /* Evaluate logical expression */
+  bool eval_logical_expr(const std::string expr);
 };
 #endif
