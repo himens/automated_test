@@ -40,7 +40,8 @@ void Test::parse_test(const std::string filename)
   // utility function: strip comment from line
   auto strip_comment = [] (std::string &line)
   {
-    line = line.substr(0, line.find('#')); 
+    auto pos = line.find('#');
+    if (pos != std::string::npos) line = line.substr(0, pos); 
   };
 
   // utility function: tell if line is comment
