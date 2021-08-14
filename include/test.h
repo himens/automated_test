@@ -2,7 +2,7 @@
 #define TEST_H
 
 #include "utils.h"
-#include "command_store.h"
+#include "commands.h"
 #include "variable.h"
 
 class Test 

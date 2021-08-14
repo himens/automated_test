@@ -1,5 +1,5 @@
-#ifndef COMMAND_STORE_H
-#define COMMAND_STORE_H
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
 #include "command.h"
 #include "utils.h"
