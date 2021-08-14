@@ -23,13 +23,27 @@
     /*****************/
     /* Tokenize line */
     /*****************/
-    std::vector<std::string> tokens(std::string line, const char delim) 
+    std::vector<std::string> tokens(const std::string line, const char delim) 
     {
       std::vector<std::string> tokens;
       std::string token;
-      std::istringstream iss(line);
+      auto first = line.find_first_of('"');
+      auto last = line.find_last_of('"');
 
-      while (std::getline(iss, token, delim)) tokens.push_back(token);
+      // do not tokenize what's inside quotes
+      if (first != std::string::npos && last != std::string::npos && delim != '"') 
+      {
+      	std::istringstream iss(line.substr(0, first));
+	while (std::getline(iss, token, delim)) tokens.push_back(token);
+	tokens.push_back(line.substr(first, last));
+      }
+
+      // tokenize whole line
+      else
+      {
+      	std::istringstream iss(line);
+	while (std::getline(iss, token, delim)) tokens.push_back(token);
+      }
 
       return tokens;
     };
@@ -55,10 +69,10 @@
   };
   
 
-  /*******************************/
-  /* Evaluate logical expression */
-  /*******************************/
-  bool eval_logical_expr(const std::string expr)
+  /***********************************/
+  /* Evaluate conditional expression */
+  /***********************************/
+  bool eval_conditional_expr(const std::string expr)
   {
     // tell if str is relational expr
     auto is_relational = [] (const std::string str)
