@@ -95,7 +95,7 @@ void Test::parse_test(const std::string filename)
   };
 
   // utility function: replace variables
-  auto replace_variable_with_val = [&] (const std::vector<std::string> args)
+  auto replace_variable_with_val = [&] (const std::vector<std::string> &args)
   {
     auto args_r = args;
 
@@ -304,7 +304,7 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
       }
 
-      auto alias = sect_args[0];
+      auto alias_name = sect_args[0];
       auto tgt = sect_args[2];
 
       if (tgt.front() == '$') // alias to variable
@@ -318,7 +318,7 @@ void Test::parse_test(const std::string filename)
 	auto it = std::find(_variables.begin(), _variables.end(), Variable{tgt_name});
 	if (it != _variables.end()) 
 	{
-	  _alias_to_tgt_map[alias] = tgt;
+	  _alias_to_tgt_map[alias_name] = tgt;
 	}
 	else
 	{
@@ -332,7 +332,7 @@ void Test::parse_test(const std::string filename)
 	auto cmd = get_command(cmd_name);
 	if (cmd)
 	{ 
-	  _alias_to_tgt_map[alias] = tgt;
+	  _alias_to_tgt_map[alias_name] = tgt;
 	}
 	else
 	{

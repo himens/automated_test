@@ -23,7 +23,7 @@ class UserCmd : public Command
     void run()
     {
       // replace placeholders 
-      auto replace_placeholder_with_val = [&](const std::vector<std::string> args)
+      auto replace_placeholder_with_val = [&](const std::vector<std::string> &args)
       {
 	auto args_r = args;
 
