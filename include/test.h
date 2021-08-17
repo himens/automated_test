@@ -23,13 +23,13 @@ class Test
     {
       std::shared_ptr<Command> cmd = nullptr;
       
-      auto it = std::find_if(_usr_commands.begin(), _usr_commands.end(), 
+      auto it = std::find_if(_user_commands.begin(), _user_commands.end(), 
 	  [&] (UserCmd cmd) { return name == cmd.get_name(); });
 
       if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
       else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
       else if (name == "check") cmd = std::make_shared<CheckCmd>();
-      else if (it != _usr_commands.end()) cmd = std::make_shared<UserCmd>(*it);
+      else if (it != _user_commands.end()) cmd = std::make_shared<UserCmd>(*it);
       else 
       {
 	throw Error("Unknown command '" + name + "'!");
@@ -40,7 +40,7 @@ class Test
 
   private:
     std::vector<Step> _steps = {};
-    std::vector<UserCmd> _usr_commands = {};
+    std::vector<UserCmd> _user_commands = {};
     std::vector<Variable> _variables = {};
 };
 #endif

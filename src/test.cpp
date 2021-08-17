@@ -66,8 +66,8 @@ void Test::parse_test(const std::string filename)
     }
   };
 
-  // utility function: replace variables
-  auto replace_variable_with_val = [&] (const std::vector<std::string> &args)
+  // utility function: replace variables with their values
+  auto replace_var_with_val = [&] (const std::vector<std::string> &args)
   {
     auto args_r = args;
 
@@ -132,7 +132,7 @@ void Test::parse_test(const std::string filename)
 	auto cmd_args = Utils::remove_first_token( tokens );
 	auto cmd = get_command(cmd_name);
 	
-	cmd->set_args( replace_variable_with_val(cmd_args) );
+	cmd->set_args( replace_var_with_val(cmd_args) );
 	commands.push_back(cmd);
       } 
 
@@ -152,14 +152,14 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing command name!");
       }
 
-      auto usr_cmd_name = sect_args[0];
+      auto name = sect_args[0];
       auto placeholders = Utils::remove_first_token(sect_args);
       std::vector<std::shared_ptr<Command>> commands = {};
 
-      if (std::find_if(_usr_commands.begin(), _usr_commands.end(), 
-	    [&] (UserCmd cmd) { return cmd.get_name() == usr_cmd_name; }) != _usr_commands.end())
+      if (std::find_if(_user_commands.begin(), _user_commands.end(), 
+	    [&] (UserCmd cmd) { return cmd.get_name() == name; }) != _user_commands.end())
       {
-        throw Error("user command '" + usr_cmd_name + "' already defined!"); 
+        throw Error("user command '" + name + "' already defined!"); 
       }
 
       /* Parse body */ 
@@ -174,7 +174,7 @@ void Test::parse_test(const std::string filename)
 	auto cmd_args = Utils::remove_first_token(tokens);
 	auto cmd = get_command(cmd_name);
 	
-	cmd->set_args( replace_variable_with_val(cmd_args) );
+	cmd->set_args( replace_var_with_val(cmd_args) );
 	commands.push_back(cmd);
       } 
       
@@ -183,7 +183,7 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
 
-      _usr_commands.push_back({usr_cmd_name, placeholders, commands});
+      _user_commands.push_back({name, placeholders, commands});
     }
 	
     /* '\include' section */
