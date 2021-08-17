@@ -142,7 +142,7 @@ void Test::parse_test(const std::string filename)
 
       if (!is_end_of_section(line)) 
       {
-	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
+	throw SyntaxError("cannot find '\\end' of '" + section + " " + name + "'!"); 
       }
 
       _steps.push_back({name, commands});
@@ -184,7 +184,7 @@ void Test::parse_test(const std::string filename)
       
       if (!is_end_of_section(line)) 
       {
-	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
+	throw SyntaxError("cannot find '\\end' of '" + section + " " + name + "'!"); 
       }
 
       _user_commands.push_back({name, placeholders, commands});
