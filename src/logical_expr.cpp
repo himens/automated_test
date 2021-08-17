@@ -185,6 +185,12 @@ namespace Detail
       }
     }
 
+    while (!s.empty())
+    {
+      result = static_cast<bool>(s.top());
+      s.pop();
+    }
+    
     return result;
   };
 };

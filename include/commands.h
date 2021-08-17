@@ -109,7 +109,7 @@ class CheckCmd : public Command
       LogicalExpr logical_expr{expr, variables};
       bool passed = logical_expr.eval();
 
-      std::cout << "Check: " << expr << " " << (passed ? "PASSED" : "FAILED") << std::endl;
+      std::cout << "Check: " << expr << " " << (passed ? "PASSED" : "FAILED") << "\n";
     }
 };
 

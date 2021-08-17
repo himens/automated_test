@@ -11,7 +11,7 @@
 
 \user_cmd test2 _x
 	@test $var2 _x 
-	@check 1.2 1.211
+	@check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 65)"
 \end
 
 \step example
