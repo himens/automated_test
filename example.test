@@ -9,7 +9,16 @@
 	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1)"
 \end
 
-\step example
+\step step1
 	test2 10
 	test 999 1000
 \end
+
+\step step2
+	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1) && ($AER_HW::ground_speed > 180)"
+\end
+
+\step step3
+	set_thrust 1000
+	test2 5
+\end 

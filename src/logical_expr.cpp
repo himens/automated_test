@@ -122,7 +122,7 @@ namespace Detail
       s.pop();
     }
 
-    std::cout << "postfix: " << postfix << "\n";
+    //std::cout << "postfix: " << postfix << "\n";
 
     return postfix;
   };
@@ -154,8 +154,8 @@ namespace Detail
 
 	bool res = is_relational_op(c) ? do_relational_op(c, op1, op2) : do_logical_op(c, op1, op2);
 
-	std::cout << "operator: " << c << "\n";
-	std::cout << "result: " << op1 << " " << c << " " << op2 << " " << res << "\n";
+	//std::cout << "operator: " << c << "\n";
+	//std::cout << "result: " << op1 << " " << c << " " << op2 << " " << res << "\n";
 
 	s.push(res);
       }
@@ -167,7 +167,7 @@ namespace Detail
 
 	while ((i+1 < postfix.length()) && Utils::is_digit({postfix[i+1]})) op += postfix[++i];
 
-	std::cout << "numeric op: " << op << "\n";
+	//std::cout << "numeric op: " << op << "\n";
 	s.push(std::stof(op));
       }
 
@@ -182,7 +182,7 @@ namespace Detail
 	if (it != variables.end())
 	{
 	  s.push(std::stof(it->get_value()));
-	  std::cout << "variable op: " << var << ", value: " << it->get_value() << "\n";
+	  //std::cout << "variable op: " << var << ", value: " << it->get_value() << "\n";
 	}
 	else
 	{

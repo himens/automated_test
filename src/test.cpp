@@ -17,7 +17,6 @@ void Test::run()
   {
     Utils::print_banner("Run step '" + step.get_name() + "':");
     step.run();
-    std::cout << "\n";
   }
   
   Utils::print_banner("Test done!");
