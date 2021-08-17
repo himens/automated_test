@@ -48,7 +48,10 @@ namespace Utils
     if (first != std::string::npos && last != std::string::npos && delim != '"') 
     {
       std::istringstream iss(line.substr(0, first));
-      while (std::getline(iss, token, delim)) tokens.push_back(token);
+      while (std::getline(iss, token, delim)) 
+      {
+	if (!token.empty()) tokens.push_back(token);
+      }
 
       tokens.push_back(line.substr(first, last));
     }
@@ -57,7 +60,10 @@ namespace Utils
     else
     {
       std::istringstream iss(line);
-      while (std::getline(iss, token, delim)) tokens.push_back(token);
+      while (std::getline(iss, token, delim)) 
+      {
+	if (!token.empty()) tokens.push_back(token);
+      }
     }
 
     return tokens;

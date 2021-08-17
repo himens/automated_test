@@ -24,8 +24,8 @@ void Test::run()
 /*******************/
 void Test::parse_test(const std::string filename)
 {
-  // utility function: polish line removing comments and tabs
-  auto polish_line = [] (std::string &line)
+  // utility function: remove comments and tabs from line
+  auto strip_tabs_and_comments = [] (std::string &line)
   {
     auto pos = line.find('#');
     if (pos != std::string::npos) line = line.substr(0, pos); // remove comments
@@ -35,10 +35,9 @@ void Test::parse_test(const std::string filename)
   // utility function: tell if line is comment
   auto is_comment = [&] (std::string line)
   {
-    polish_line(line); 
-    Utils::strip_char(' ', line); // remove spaces
+    strip_tabs_and_comments(line); 
 
-    return line.length() == 0;
+    return Utils::tokens(line).size() == 0;
   };
 
   // utility function: check end section in line
@@ -49,8 +48,8 @@ void Test::parse_test(const std::string filename)
     return tokens.size() > 0 && tokens.front() == "\\end";
   };
 
-  // utility function: check if body line is formatted
-  auto check_body = [&] (const std::string line)
+  // utility function:perform some sanity checks on body line
+  auto check_body_line = [&] (const std::string line)
   {
     if (is_end_of_section(line) || is_comment(line)) return; // skip comment and end of section 
 
@@ -128,8 +127,8 @@ void Test::parse_test(const std::string filename)
       while (std::getline(file, line) && !is_end_of_section(line))
       {
 	if (line.empty() || is_comment(line)) continue;
-	check_body(line);
-	polish_line(line);
+	check_body_line(line);
+	strip_tabs_and_comments(line);
 
 	auto tokens = Utils::tokens( line );
 	auto cmd_name = tokens[0];
@@ -170,8 +169,8 @@ void Test::parse_test(const std::string filename)
       while (std::getline(file, line) && !is_end_of_section(line))
       {
 	if (line.empty() || is_comment(line)) continue;
-	check_body(line);
-	polish_line(line);
+	check_body_line(line);
+	strip_tabs_and_comments(line);
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
