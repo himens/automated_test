@@ -6,7 +6,6 @@
 #include <string>
 #include <stdexcept>
 
-
 /* Custom exception */
 class Error : public std::exception 
 {

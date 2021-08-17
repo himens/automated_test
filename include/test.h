@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "commands.h"
 #include "variable.h"
+#include "step.h"
 
 class Test 
 {
@@ -38,10 +39,7 @@ class Test
     }
 
   private:
-    /* Print banner */
-    void print_banner(const std::string, size_t length = 0);
-
-    std::vector<std::shared_ptr<Command>> _commands = {};
+    std::vector<Step> _steps = {};
     std::vector<UserCmd> _usr_commands = {};
     std::vector<Variable> _variables = {};
 };

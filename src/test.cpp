@@ -5,36 +5,22 @@
 /************/
 void Test::run()
 {
-  if (_commands.size() == 0)
+  if (_steps.size() == 0)
   {
-    print_banner("Test has no commands to run!");
+    Utils::print_banner("Test has no steps!");
     return;
   }
 
-  print_banner("Run test!");
+  Utils::print_banner("Run test!");
 
-  for (auto cmd : _commands)
+  for (auto step : _steps)
   {
-    std::cout << "Run '" << cmd->get_name() << "': \n";
-    cmd->run();
+    Utils::print_banner("Run step '" + step.get_name() + "':");
+    step.run();
     std::cout << "\n";
   }
   
-  print_banner("Test done!");
-}
-
-
-/****************/
-/* Print banner */
-/****************/
-void Test::print_banner(const std::string str, size_t length)
-{
-  if (length == 0) length = str.size() + 2;
-
-  std::cout << "\n";
-  std::cout << std::string(length, '*') << "\n";
-  std::cout << str << "\n";
-  std::cout << std::string(length, '*') << "\n";
+  Utils::print_banner("Test done!");
 }
 
 
@@ -109,7 +95,7 @@ void Test::parse_test(const std::string filename)
     return args_r;
   };
 
-  print_banner("Read file: " + filename);
+  Utils::print_banner("Read file: " + filename);
 
   /* Open file */
   std::ifstream file(filename, std::ios::in);
@@ -136,7 +122,8 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing step name!");
       }
 
-      auto step_name = sect_args[0];
+      auto name = sect_args[0];
+      std::vector<std::shared_ptr<Command>> commands = {};
 
       /* Parse body */
       while (std::getline(file, line) && !is_end_of_section(line))
@@ -151,13 +138,15 @@ void Test::parse_test(const std::string filename)
 	auto cmd = get_command(cmd_name);
 	
 	cmd->set_args( replace_variable_with_val(cmd_args) );
-	_commands.push_back(cmd);
+	commands.push_back(cmd);
       } 
 
       if (!is_end_of_section(line)) 
       {
 	throw SyntaxError("cannot find '\\end' of '" + section + "'!"); 
       }
+
+      _steps.push_back({name, commands});
     }
 
     /* '\user_cmd' section */

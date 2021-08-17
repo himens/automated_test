@@ -2,6 +2,20 @@
 
 namespace Utils
 {
+  /****************/
+  /* Print banner */
+  /****************/
+  void print_banner(const std::string str, size_t length)
+  {
+    if (length == 0) length = str.size() + 2;
+
+    std::cout << "\n";
+    std::cout << std::string(length, '*') << "\n";
+    std::cout << str << "\n";
+    std::cout << std::string(length, '*') << "\n";
+  }
+
+
   /********************************/
   /* Tell if string is alphabetic */
   /********************************/

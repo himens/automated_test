@@ -18,6 +18,9 @@
 /***********/
 namespace Utils
 {
+  /* Print banner */
+  void print_banner(const std::string str, size_t length = 0);
+
   /* Tell if string is digit */
   bool is_digit(const std::string str);
 

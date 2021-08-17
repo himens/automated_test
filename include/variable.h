@@ -33,6 +33,11 @@ class Variable
 	throw Error("illegal variable name '" + name + "'! Missing '$'!");
       }
 
+      if (name == "$")
+      {
+	throw Error("empty variable name '" + name + "'!");
+      }
+
       _name = name; 
     }
     void set_value(const std::string value) { _value = value; }

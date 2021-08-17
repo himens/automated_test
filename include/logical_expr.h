@@ -1,12 +1,6 @@
 #ifndef LOGICAL_EXPR_H
 #define LOGICAL_EXPR_H
 
-#include <iostream>
-#include <string>
-#include <map>
-#include <vector>
-#include <algorithm>
-
 #include "error.h"
 #include "variable.h"
 #include "utils.h"
