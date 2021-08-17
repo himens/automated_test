@@ -1,6 +1,6 @@
 \user_cmd test _x _y
-	@set_thrust _x
-	@set_thrust _y
-	@insert_pds
+	set_thrust _x
+	set_thrust _y
+	insert_pds
 \end
 

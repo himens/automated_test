@@ -1,22 +1,15 @@
 # This is an example test 
 \include my_commands.test 
 
-\var var1 := 18
-
-\alias my_alias := @test
-\alias my_alias2 := @set_thrust
-
-\alias var2 := $var1
-\set var2 := 77
+\var $var1 := 18
+\set $var1 := 77
 
 \user_cmd test2 _x
-	@test $var2 _x 
-	@check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 65)"
+	test $var1 _x 
+	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1)"
 \end
 
 \step example
-	@test2 10
-	@test 999 1000
-	@my_alias 1 2
-	@my_alias2 1 
+	test2 10
+	test 999 1000
 \end

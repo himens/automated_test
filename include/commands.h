@@ -87,20 +87,23 @@ class CheckCmd : public Command
 
       while (begin != std::string::npos && end != std::string::npos) 
       {
-	auto var_name = expr.substr(begin, end - begin);
+	auto var = expr.substr(begin, end - begin);
 
-       	auto pos = var_name.find("::");
-        if (pos != std::string::npos) 
-        {
-          auto area = var_name.substr(0, pos);
-          auto field = var_name.substr(pos);
-	  std::string value{"65"};
+	variables.push_back({var, "1"});
 
-          Utils::strip_char('$', area);
-          Utils::strip_char(':', field);
+	// you should get area data here...
+       	//auto pos = var.find("::");
+        //if (pos != std::string::npos) 
+        //{
+        //  auto area = var.substr(0, pos);
+        //  auto field = var.substr(pos);
+	//  std::string value{"65"};
 
-	  variables.push_back({var_name, value});
-        }
+        //  Utils::strip_char('$', area);
+        //  Utils::strip_char(':', field);
+
+	//  variables.push_back({var, value});
+        //}
         
         begin = expr.find("$", end + 1);
         end = expr.find(" ", begin);

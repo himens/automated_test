@@ -37,6 +37,7 @@ class Command
       {
 	throw Error("Command::set_name: name is empty!");
       }
+
       _name = name; 
     }
     

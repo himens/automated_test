@@ -18,10 +18,10 @@ class Test
     void run();
 
     /* Get command */
-    std::shared_ptr<Command> get_command(std::string name)
+    std::shared_ptr<Command> get_command(const std::string name)
     {
       std::shared_ptr<Command> cmd = nullptr;
-
+      
       auto it = std::find_if(_usr_commands.begin(), _usr_commands.end(), 
 	  [&] (UserCmd cmd) { return name == cmd.get_name(); });
 

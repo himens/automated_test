@@ -156,13 +156,7 @@ namespace Detail
       else if (Utils::is_digit(c))
       {
 	std::string op{c}; 
-
-	while (i++ < postfix.length()) 
-	{
-	  std::string c{postfix[i]};
-	  if (!Utils::is_digit(c)) break;
-	  op += c;
-	}
+	while (i++ < postfix.length() && Utils::is_digit({postfix[i]})) op += postfix[i];
 	i--;
 
 	std::cout << "numeric op: " << op << "\n";
