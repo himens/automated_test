@@ -56,7 +56,7 @@ void Test::parse_test(const std::string filename)
 
     if (line.front() == '\\') // new section inside body
     {
-      throw SyntaxError("'" + line + "' new section declaration inside body!");
+      throw SyntaxError("'" + line + "' section declaration inside body! Maybe '\\end' is missing?");
     }
 
     auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
