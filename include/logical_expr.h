@@ -1,5 +1,5 @@
-#ifndef LOGICAL_EXPR
-#define LOGICAL_EXPR
+#ifndef LOGICAL_EXPR_H
+#define LOGICAL_EXPR_H
 
 #include <iostream>
 #include <string>
