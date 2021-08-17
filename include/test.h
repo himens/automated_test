@@ -44,6 +44,5 @@ class Test
     std::vector<std::shared_ptr<Command>> _commands = {};
     std::vector<UserCmd> _usr_commands = {};
     std::vector<Variable> _variables = {};
-    std::map<std::string, std::string> _alias_to_tgt_map = {};
 };
 #endif

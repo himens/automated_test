@@ -65,7 +65,7 @@ void Test::parse_test(const std::string filename)
   {
     auto tokens = Utils::tokens(line);
 
-    return tokens.size() == 1 && tokens.front() == "\\end";
+    return tokens.front() == "\\end";
   };
 
   // utility function: check if body line is formatted
