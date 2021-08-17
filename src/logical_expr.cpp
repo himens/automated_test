@@ -70,26 +70,37 @@ namespace Detail
 	if ((i+1 < infix.length()) && is_operator(c + infix[i+1])) c += infix[++i];
       }
 
-      // detect variable operand
+      // add variable operand
       if (c == "$")
       {
 	std::string var{c};
-	while (i++ < infix.length() && infix[i] != ' ') var += infix[i];
-	i--;
+
+	while ((i+1 < infix.length()) && infix[i+1] != ' ') var += infix[++i];
+
 	postfix += var + " ";
       }
 
-      //  detect numeric operand
+      //  add numeric operand
       else if (Utils::is_digit(c)) 
       {
 	std::string num{c};
-	while (i++ < infix.length() && Utils::is_digit({infix[i]})) num += infix[i];
-	i--;
+	
+	while ((i+1 < infix.length()) && Utils::is_digit({infix[i+1]})) num += infix[++i];
+	
 	postfix += num + " ";
       }
 
+      // add operator
+      else if (is_operator(c)) 
+      {
+	s.push(c + " ");
+      }
+     
       // detect begin of parenthesis block 
-      else if (c == "(") s.push(c);
+      else if (c == "(") 
+      {
+	s.push(c);
+      }
 
       // detect end of parenthesis block 
       else if (c == ")")
@@ -103,9 +114,6 @@ namespace Detail
 
 	if (s.top() == "(") s.pop();
       }
-
-      // detect operator
-      else if (is_operator(c)) s.push(c + " ");
     } 
 
     while (!s.empty())
@@ -156,8 +164,8 @@ namespace Detail
       else if (Utils::is_digit(c))
       {
 	std::string op{c}; 
-	while (i++ < postfix.length() && Utils::is_digit({postfix[i]})) op += postfix[i];
-	i--;
+
+	while ((i+1 < postfix.length()) && Utils::is_digit({postfix[i+1]})) op += postfix[++i];
 
 	std::cout << "numeric op: " << op << "\n";
 	s.push(std::stof(op));
@@ -167,14 +175,18 @@ namespace Detail
       else if (c == "$")
       {
 	std::string var{c};
-	while (i++ < postfix.length() && postfix[i] != ' ') var += postfix[i];
-	i--;
+
+	while ((i+1 < postfix.length()) && postfix[i+1] != ' ') var += postfix[++i];
 	
 	auto it = std::find(variables.begin(), variables.end(), Variable{var});
 	if (it != variables.end())
 	{
 	  s.push(std::stof(it->get_value()));
 	  std::cout << "variable op: " << var << ", value: " << it->get_value() << "\n";
+	}
+	else
+	{
+	  throw Error("eval_postfix: unknown variable '" + var + "'! Cannot be replaced by value!"); 
 	}
       }
     }
