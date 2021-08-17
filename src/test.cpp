@@ -46,16 +46,20 @@ void Test::parse_test(const std::string filename)
   {
     auto tokens = Utils::tokens(line);
 
-    return tokens.front() == "\\end";
+    return tokens.size() > 0 && tokens.front() == "\\end";
   };
 
   // utility function: check if body line is formatted
-  auto check_body_indent = [&] (const std::string line)
+  auto check_body = [&] (const std::string line)
   {
     if (is_end_of_section(line) || is_comment(line)) return; // skip comment and end of section 
 
-    auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
+    if (line.front() == '\\') // new section inside body
+    {
+      throw SyntaxError("'" + line + "' new section declaration inside body!");
+    }
 
+    auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
     if (!tabs) 
     {
       throw SyntaxError("line '" + line + "' not indented (tab missing)!");
@@ -124,7 +128,7 @@ void Test::parse_test(const std::string filename)
       while (std::getline(file, line) && !is_end_of_section(line))
       {
 	if (line.empty() || is_comment(line)) continue;
-	check_body_indent(line);
+	check_body(line);
 	polish_line(line);
 
 	auto tokens = Utils::tokens( line );
@@ -166,7 +170,7 @@ void Test::parse_test(const std::string filename)
       while (std::getline(file, line) && !is_end_of_section(line))
       {
 	if (line.empty() || is_comment(line)) continue;
-	check_body_indent(line);
+	check_body(line);
 	polish_line(line);
 
 	auto tokens = Utils::tokens(line);
