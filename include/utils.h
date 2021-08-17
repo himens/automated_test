@@ -32,8 +32,5 @@ namespace Utils
   
   /* Remove all char occurrences from string */
   void strip_char(const char c, std::string &str);
-
-  /* Evaluate conditional expression */
-  bool eval_conditional_expr(const std::string expr);
 };
 #endif

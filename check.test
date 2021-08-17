@@ -1,0 +1,6 @@
+#\alias pp_accept := @from_mem ICD_NC15_CSG_HAT_MESS_1 pp_accept
+
+\step pippo 
+	@check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1) && ($AER_HW::ground_speed > 180)"
+\end
+

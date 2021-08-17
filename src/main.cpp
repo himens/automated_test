@@ -1,19 +1,29 @@
 #include "test.h"
 
-int main()
+int main(int argc, char **argv)
 {
+  std::string test_file;
+
+  switch (argc) 
+  {
+    case 2: 
+      test_file = argv[1]; 
+      break;
+
+    default:  
+      std::cout << "Usage: ./test.exe [test file] \n";
+      return 0;
+  }
+
   try
   {
-    Test test("example.test");
+    Test test(test_file);
     test.run();
   }
   catch (const Error &e) 
   { 
     std::cout << e.what() << "\n"; 
   }
-
-  std::string s = "((a > 180) && (b == 1)) || (c == 3)";
-  Utils::eval_logical_expr(s);
 
   return 0;
 }

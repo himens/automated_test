@@ -3,6 +3,8 @@
 
 #include "command.h"
 #include "utils.h"
+#include "variable.h"
+#include "logical_expr.h"
 
 /* UserCmd class: define a user-command which is a set of already existing commands 
    plus placeholders which stands for numeric arguments to be passed when called. 
@@ -73,22 +75,41 @@ class UserCmd : public Command
 class CheckCmd : public Command
 {
   public:
-    CheckCmd() : Command("check", 2) {}
+    CheckCmd() : Command("check", 1) {}
 
     void run()
     {
-      bool passed = false;
-      auto a = this->get_args().at(0);
-      auto b = this->get_args().at(1);
+      auto expr = this->get_args().at(0);
+      std::vector<Variable> variables;
 
-      if (Utils::is_digit(a) && Utils::is_digit(b)) passed = std::abs(std::stof(a) - std::stof(b)) < 1e-5;
-      else if (!Utils::is_digit(a) && !Utils::is_digit(b)) passed = a == b;
-      else 
+      auto begin = expr.find("$");
+      auto end = expr.find(" ");
+
+      while (begin != std::string::npos && end != std::string::npos) 
       {
-	throw Error("CheckCmd: checking data of different types!");
+	auto var_name = expr.substr(begin, end - begin);
+
+       	auto pos = var_name.find("::");
+        if (pos != std::string::npos) 
+        {
+          auto area = var_name.substr(0, pos);
+          auto field = var_name.substr(pos);
+	  std::string value{"65"};
+
+          Utils::strip_char('$', area);
+          Utils::strip_char(':', field);
+
+	  variables.push_back({var_name, value});
+        }
+        
+        begin = expr.find("$", end + 1);
+        end = expr.find(" ", begin);
       }
 
-      std::cout << "check(): " << (passed ? "PASSED" : "FAILED") << std::endl;
+      LogicalExpr logical_expr{expr, variables};
+      bool passed = logical_expr.eval();
+
+      std::cout << "Check: " << expr << " " << (passed ? "PASSED" : "FAILED") << std::endl;
     }
 };
 
@@ -107,7 +128,7 @@ class SetThrustCmd : public Command
 	throw Error("SetThrustCmd: value '" + value + "' is not a number!");
       }
 
-      std::cout << "set_thrust(): thrust set to " << thrust << "\n"; 
+      std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
     }
 };
 
@@ -117,6 +138,6 @@ class InsertPdsCmd : public Command
   public:
     InsertPdsCmd() : Command("insert_pds", 0) {}
 
-    void run() { std::cout << "insert_pds(): pds inserted! \n"; }
+    void run() { std::cout << "InsertPdsCmd: pds inserted! \n"; }
 };
 #endif
