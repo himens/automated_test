@@ -3,7 +3,6 @@
 
 #include "command.h"
 
-
 class Step
 {
   public:
@@ -20,6 +19,8 @@ class Step
 	return;
       }
 
+      Utils::print_banner("Run step '" + _name + "':");
+      
       for (auto cmd : _commands)
       {
 	std::cout << "Run command '" << cmd->get_name() << "':\n";
@@ -33,7 +34,7 @@ class Step
     { 
       if (name.empty()) 
       {
-	throw Error("Command::set_name: name is empty!");
+	throw Error("Step::set_name: name is empty!");
       }
 
       _name = name; 

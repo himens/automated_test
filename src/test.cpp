@@ -13,12 +13,8 @@ void Test::run()
 
   Utils::print_banner("Run test!");
 
-  for (auto step : _steps)
-  {
-    Utils::print_banner("Run step '" + step.get_name() + "':");
-    step.run();
-  }
-  
+  for (auto step : _steps) step.run();
+
   Utils::print_banner("Test done!");
 }
 

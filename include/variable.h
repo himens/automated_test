@@ -30,12 +30,12 @@ class Variable
     { 
       if (name.front() != '$')
       {
-	throw Error("illegal variable name '" + name + "'! Missing '$'!");
+	throw Error("Variable::set_name: illegal variable name '" + name + "'! Missing '$'!");
       }
 
       if (name == "$")
       {
-	throw Error("empty variable name '" + name + "'!");
+	throw Error("Variable::set_name: illegal variable name '" + name + "'!");
       }
 
       _name = name; 
