@@ -1,8 +1,6 @@
 #ifndef STEP_H
 #define STEP_H
 
-#include "commands.h"
-
 class Step
 {
   public:
@@ -29,20 +27,16 @@ class Step
       }
     }
 
-    /* Write step results to file */
-    void write_report(const std::string filename) const
+    /* Write step report to file */
+    void write_report(std::ofstream &file) const
     {
-      std::ofstream file;
-      file.open(filename, std::ios_base::app);
       if (!file.is_open())
       {
-        throw Error("cannot open file '" + filename + "'!");
+        throw Error("cannot open report file!");
       }
 
-      file << "## Result of step: " << _name << "\n";
-      file.close();
-
-      for (auto cmd : _commands) cmd->write_report(filename);
+      file << "## Report of step: " << _name << "\n";
+      for (auto cmd : _commands) cmd->write_report(file);
     }
 
     /* Set/get */

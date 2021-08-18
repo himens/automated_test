@@ -21,4 +21,5 @@
 \step step3
 	set_thrust 1000
 	test2 5
+	check "(($RIGHT_COCKPIT_CONTROL::pds_inserted == 1) && ($RIGHT_COCKPIT_CONTROL::mdlr_open == 0)) || ($AER_HW::ground_speed > 180)"
 \end 

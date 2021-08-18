@@ -17,11 +17,11 @@ class Command
     Command(const size_t n) { _args.resize(n); }
     Command(const std::string name, const size_t n) : Command(n) { set_name(name); }
 
-    /* Run command*/
+    /* Run command */
     virtual void run() = 0;
 
-    /* Write command results to file */
-    virtual void write_report(const std::string filename) const = 0;
+    /* Write command report to file */
+    virtual void write_report(std::ofstream &file) const = 0;
 
     /* Set/get */
     void set_args(const std::vector<std::string> &args)

@@ -22,6 +22,7 @@ class UserCmd : public Command
       set_commands(commands);
     }
 
+    /* Run command */
     void run()
     {
       // replace placeholders 
@@ -49,9 +50,10 @@ class UserCmd : public Command
       }
     }
     
-    void write_report(const std::string filename) const
+    /* Write command report to file */
+    void write_report(std::ofstream &file) const
     {
-      for (auto cmd : _commands) cmd->write_report(filename);
+      for (auto cmd : _commands) cmd->write_report(file);
     }
 
     /* Set/get */
@@ -82,6 +84,7 @@ class CheckCmd : public Command
   public:
     CheckCmd() : Command("check", 1) {}
 
+    /* Run command */
     void run()
     {
       auto expr = this->get_args().at(0);
@@ -104,23 +107,20 @@ class CheckCmd : public Command
       std::cout << "Check: " << expr << " " << (_expr.eval() ? "PASSED" : "FAILED") << "\n";
     }
 
-    void write_report(const std::string filename) const
+    /* Write command report to file */
+    void write_report(std::ofstream &file) const
     {
-      std::ofstream file;
-      file.open(filename, std::ios::app);
       if (!file.is_open())
       {
-	throw Error("cannot open file '" + filename + "'!");
+        throw Error("cannot open report file!");
       }
 
       file << "### CheckCmd report: \n";
       file << "#### Condition: \n";
       file << _expr.get_expr() << "\n";
       file << "#### Result: \n"; 
-      file << (_expr.eval() ? "PASSED" : "FAILED") << "\n";
+      file << (_expr.eval() ? "**PASSED**" : "**FAILED**") << "\n";
       file << "\n";
-
-      file.close();
     }
 
   private: 
@@ -133,6 +133,7 @@ class SetThrustCmd : public Command
   public:
     SetThrustCmd() : Command("set_thrust", 1) {}
 
+    /* Run command */
     void run()
     {
       auto value = this->get_args().at(0);
@@ -145,7 +146,8 @@ class SetThrustCmd : public Command
       std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
     }
 
-    void write_report(const std::string filename) const {}
+    /* Write command report to file */
+    void write_report(std::ofstream &file) const {}
 };
 
 /* Insert PDS command */
@@ -154,8 +156,10 @@ class InsertPdsCmd : public Command
   public:
     InsertPdsCmd() : Command("insert_pds", 0) {}
 
+    /* Run command */
     void run() { std::cout << "InsertPdsCmd: pds inserted! \n"; }
     
-    void write_report(const std::string filename) const {}
+    /* Write command report to file */
+    void write_report(std::ofstream &file) const {}
 };
 #endif

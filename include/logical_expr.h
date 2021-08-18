@@ -1,7 +1,7 @@
 #ifndef LOGICAL_EXPR_H
 #define LOGICAL_EXPR_H
 
-#include<stack>
+#include <stack>
 
 #include "error.h"
 #include "variable.h"
