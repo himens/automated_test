@@ -40,6 +40,7 @@ class Variable
 
       _name = name; 
     }
+
     void set_value(const std::string value) { _value = value; }
 
     const std::string get_name() const { return _name; }

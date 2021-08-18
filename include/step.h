@@ -39,9 +39,10 @@ class Step
 
       _name = name; 
     }
-    const std::string get_name() const { return _name; }
-    
+
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands) { _commands = commands; }
+
+    const std::string get_name() const { return _name; }
     const std::vector<std::shared_ptr<Command>> &get_commands() const { return _commands; }
 
   private:

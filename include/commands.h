@@ -80,30 +80,15 @@ class CheckCmd : public Command
     void run()
     {
       auto expr = this->get_args().at(0);
-      std::vector<Variable> variables;
-
       auto begin = expr.find("$");
       auto end = expr.find(" ");
+      std::vector<Variable> variables;
 
       while (begin != std::string::npos && end != std::string::npos) 
       {
 	auto var = expr.substr(begin, end - begin);
 
 	variables.push_back({var, "1"});
-
-	// you should get area data here...
-       	//auto pos = var.find("::");
-        //if (pos != std::string::npos) 
-        //{
-        //  auto area = var.substr(0, pos);
-        //  auto field = var.substr(pos);
-	//  std::string value{"65"};
-
-        //  Utils::strip_char('$', area);
-        //  Utils::strip_char(':', field);
-
-	//  variables.push_back({var, value});
-        //}
         
         begin = expr.find("$", end + 1);
         end = expr.find(" ", begin);
