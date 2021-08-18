@@ -41,7 +41,7 @@ class Command
       _name = name; 
     }
     
-    const std::vector<std::string> &get_args() const { return _args; }
+    const std::vector<std::string>& get_args() const { return _args; }
     const std::string get_name() const { return _name; }
 
   private:

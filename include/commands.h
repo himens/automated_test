@@ -63,8 +63,8 @@ class UserCmd : public Command
       _placeholders = placeholders;
     }
     
-    const std::vector<std::shared_ptr<Command>> get_commands() const { return _commands; }
-    const std::vector<std::string> get_placeholders() const { return _placeholders; }
+    const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }
+    const std::vector<std::string>& get_placeholders() const { return _placeholders; }
 
   private:
     std::vector<std::shared_ptr<Command>> _commands;
