@@ -10,15 +10,13 @@
 #include <memory>
 #include <algorithm>
 
-#include "error.h"
-
 /***********/
 /* Utils */
 /***********/
 namespace Utils
 {
   /* Print banner */
-  void print_banner(const std::string str, size_t length = 0);
+  void print_banner(const std::string str);
 
   /* Tell if string is digit */
   bool is_digit(const std::string str);

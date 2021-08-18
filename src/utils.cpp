@@ -5,9 +5,9 @@ namespace Utils
   /****************/
   /* Print banner */
   /****************/
-  void print_banner(const std::string str, size_t length)
+  void print_banner(const std::string str)
   {
-    if (length == 0) length = str.size() + 2;
+    auto length = str.size() + 2;
 
     std::cout << "\n";
     std::cout << std::string(length, '*') << "\n";
