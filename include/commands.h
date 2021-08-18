@@ -90,12 +90,11 @@ class CheckCmd : public Command
       auto expr = this->get_args().at(0);
       auto begin = expr.find("$");
       auto end = expr.find(" ");
-      std::vector<Variable> variables;
 
+      std::vector<Variable> variables;
       while (begin != std::string::npos && end != std::string::npos) 
       {
 	auto var = expr.substr(begin, end - begin);
-
 	variables.push_back({var, "1"});
         
         begin = expr.find("$", end + 1);
