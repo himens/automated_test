@@ -2,7 +2,7 @@
 EXE := test.exe
 
 # Compiler
-CXX = g++
+CXX := g++
 
 # Paths
 SRC := src
@@ -13,7 +13,7 @@ OBJ := obj
 CXXFLAGS := -Wall -fPIC -O3 -std=c++11 # C++11
 
 # Src, obj, inc
-SRCS = $(wildcard $(SRC)/*.cpp)
+SRCS := $(wildcard $(SRC)/*.cpp)
 OBJS := $(patsubst $(SRC)/%.cpp, $(OBJ)/%.o, $(SRCS))
 
 .PHONY: all clean
