@@ -18,7 +18,7 @@ class LogicalExpr
     };
 
     /* Evaluate logical expression */
-    bool eval();
+    bool eval() const;
     
     /* Get/set */
     void set_expr(const std::string expr) { _expr = expr; }

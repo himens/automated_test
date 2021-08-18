@@ -5,15 +5,24 @@
 /************/
 void Test::run()
 {
+  const std::string filename = "result.md";
+
   if (_steps.size() == 0)
   {
     Utils::print_banner("Test has no steps!");
     return;
   }
 
+  std::ofstream file(filename, std::ios::out);
+  file.close();
+
   Utils::print_banner("Run test!");
 
-  for (auto step : _steps) step.run();
+  for (auto step : _steps) 
+  { 
+    step.run();
+    step.write_report(filename);
+  }
 
   Utils::print_banner("Test done!");
 }

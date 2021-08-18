@@ -1,5 +1,8 @@
 #include "logical_expr.h"
 
+/********************/
+/* Detail namespace */
+/********************/
 namespace Detail
 {
   // utility function: tell if str is relational expr
@@ -201,7 +204,11 @@ namespace Detail
   };
 };
 
-bool LogicalExpr::eval()
+
+/*******************************/
+/* Evaluate logical expression */
+/*******************************/
+bool LogicalExpr::eval() const
 {
   auto postfix = Detail::to_postfix(_expr);
   bool result = Detail::eval_postfix(postfix, _variables);

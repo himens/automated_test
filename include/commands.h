@@ -49,6 +49,11 @@ class UserCmd : public Command
       }
     }
     
+    void write_report(const std::string filename) const
+    {
+      for (auto cmd : _commands) cmd->write_report(filename);
+    }
+
     /* Set/get */
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands) { _commands = commands; }
     
@@ -94,11 +99,32 @@ class CheckCmd : public Command
         end = expr.find(" ", begin);
       }
 
-      LogicalExpr logical_expr{expr, variables};
-      bool passed = logical_expr.eval();
+      _expr = {expr, variables};
 
-      std::cout << "Check: " << expr << " " << (passed ? "PASSED" : "FAILED") << "\n";
+      std::cout << "Check: " << expr << " " << (_expr.eval() ? "PASSED" : "FAILED") << "\n";
     }
+
+    void write_report(const std::string filename) const
+    {
+      std::ofstream file;
+      file.open(filename, std::ios::app);
+      if (!file.is_open())
+      {
+	throw Error("cannot open file '" + filename + "'!");
+      }
+
+      file << "### CheckCmd report: \n";
+      file << "#### Condition: \n";
+      file << _expr.get_expr() << "\n";
+      file << "#### Result: \n"; 
+      file << (_expr.eval() ? "PASSED" : "FAILED") << "\n";
+      file << "\n";
+
+      file.close();
+    }
+
+  private: 
+    LogicalExpr _expr;
 };
 
 /* Set thrust command */
@@ -118,6 +144,8 @@ class SetThrustCmd : public Command
 
       std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
     }
+
+    void write_report(const std::string filename) const {}
 };
 
 /* Insert PDS command */
@@ -127,5 +155,7 @@ class InsertPdsCmd : public Command
     InsertPdsCmd() : Command("insert_pds", 0) {}
 
     void run() { std::cout << "InsertPdsCmd: pds inserted! \n"; }
+    
+    void write_report(const std::string filename) const {}
 };
 #endif

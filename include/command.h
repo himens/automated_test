@@ -20,6 +20,9 @@ class Command
     /* Run command*/
     virtual void run() = 0;
 
+    /* Write command results to file */
+    virtual void write_report(const std::string filename) const = 0;
+
     /* Set/get */
     void set_args(const std::vector<std::string> &args)
     {

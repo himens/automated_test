@@ -1,7 +1,7 @@
 #ifndef STEP_H
 #define STEP_H
 
-#include "command.h"
+#include "commands.h"
 
 class Step
 {
@@ -11,7 +11,7 @@ class Step
     Step (const std::string name, std::vector<std::shared_ptr<Command>> &commands) : Step(name) { set_commands(commands); }
 
     /* Run step */
-    void run() 
+    void run()
     {
       if (_commands.size() == 0)
       {
@@ -20,13 +20,29 @@ class Step
       }
 
       Utils::print_banner("Run step '" + _name + "':");
-      
+
       for (auto cmd : _commands)
       {
 	std::cout << "Run command '" << cmd->get_name() << "':\n";
 	cmd->run();
 	std::cout << "\n";
       }
+    }
+
+    /* Write step results to file */
+    void write_report(const std::string filename) const
+    {
+      std::ofstream file;
+      file.open(filename, std::ios_base::app);
+      if (!file.is_open())
+      {
+        throw Error("cannot open file '" + filename + "'!");
+      }
+
+      file << "## Result of step: " << _name << "\n";
+      file.close();
+
+      for (auto cmd : _commands) cmd->write_report(filename);
     }
 
     /* Set/get */

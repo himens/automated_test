@@ -15,7 +15,7 @@
 \end
 
 \step step2
-	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1) && ($AER_HW::ground_speed > 180)"
+	check "(($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1) && ($AER_HW::ground_speed > 180)) && ($ICD_AC15_BRD_HAT_MESS_1::config_checks > 0)"
 \end
 
 \step step3
