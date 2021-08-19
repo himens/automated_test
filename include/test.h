@@ -18,6 +18,7 @@ class Test
     /* Run test */
     void run();
 
+  private:
     /* Make predefined command object */
     std::shared_ptr<Command> make_predefined_cmd(const std::string name)
     {
@@ -33,7 +34,6 @@ class Test
     /* Make command object */
     std::shared_ptr<Command> make_command(const std::string name);
 
-  private:
     std::vector<Step> _steps = {};
     std::vector<UserCmd> _user_commands = {};
     std::vector<Variable> _variables = {};
