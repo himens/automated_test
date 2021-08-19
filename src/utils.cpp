@@ -69,6 +69,7 @@ namespace Utils
     return tokens;
   }
 
+
   /*******************************************/
   /* Remove all char occurrences from string */
   /*******************************************/
@@ -77,15 +78,12 @@ namespace Utils
     str.erase(std::remove(str.begin(), str.end(), c), str.end()); 
   }
 
-  /***********************************/
-  /* Get all tokens except first one */
-  /***********************************/
-  std::vector<std::string> remove_first_token(const std::vector<std::string> &tokens)
-  {
-    auto args = tokens;
-    if (tokens.size() > 1) args.erase(args.begin());
-    else args = {};
 
-    return args;
+  /**********************/
+  /* Remove first token */
+  /**********************/
+  void remove_first_token(std::vector<std::string> &tokens)
+  {
+    if (tokens.size() > 0) tokens.erase( tokens.begin() );
   }
 };

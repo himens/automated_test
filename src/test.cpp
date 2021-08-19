@@ -58,9 +58,9 @@ void Test::parse_test(const std::string filename)
   // utility function:perform some sanity checks on body line
   auto check_body_line = [&] (const std::string line)
   {
-    if (is_end_of_section(line) || is_comment(line)) return; // skip comment and end of section 
+    if (line.empty() || is_end_of_section(line) || is_comment(line)) return;
 
-    if (line.front() == '\\') // new section inside body
+    if (line.front() == '\\') // section inside body
     {
       throw SyntaxError("'" + line + "' section declaration inside body! Maybe '\\end' is missing?");
     }
@@ -77,13 +77,11 @@ void Test::parse_test(const std::string filename)
   };
 
   // utility function: replace variables with their values
-  auto replace_var_with_val = [&] (const std::vector<std::string> &args)
+  auto replace_variable_with_val = [&] (std::vector<std::string> &args)
   {
-    auto args_r = args;
-
-    for (auto &arg : args_r) 
+    for (auto &arg : args) 
     {
-      if (arg.front() == '$') 
+      if (!arg.empty() && arg.front() == '$') 
       {
 	auto it = std::find(_variables.begin(), _variables.end(), Variable{arg});
 	if (it != _variables.end()) 
@@ -96,8 +94,6 @@ void Test::parse_test(const std::string filename)
 	}
       }
     }
-
-    return args_r;
   };
 
   Utils::print_banner("Read file: " + filename);
@@ -117,7 +113,8 @@ void Test::parse_test(const std::string filename)
 
     auto tokens = Utils::tokens(line);
     auto section = tokens[0];
-    auto sect_args = Utils::remove_first_token(tokens);
+    Utils::remove_first_token(tokens);
+    auto sect_args = tokens;
 
     /* '\step' section */
     if (section == "\\step")
@@ -137,12 +134,15 @@ void Test::parse_test(const std::string filename)
 	check_body_line(line);
 	strip_tabs_and_comments(line);
 
-	auto tokens = Utils::tokens( line );
+	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	auto cmd_args = Utils::remove_first_token( tokens );
+	Utils::remove_first_token(tokens);
+	auto cmd_args = tokens;
+
+	replace_variable_with_val(cmd_args);
+
 	auto cmd = get_command(cmd_name);
-	
-	cmd->set_args( replace_var_with_val(cmd_args) );
+	cmd->set_args(cmd_args);
 	commands.push_back(cmd);
       } 
 
@@ -163,7 +163,8 @@ void Test::parse_test(const std::string filename)
       }
 
       auto name = sect_args[0];
-      auto placeholders = Utils::remove_first_token(sect_args);
+      Utils::remove_first_token(sect_args);
+      auto placeholders = sect_args;
       std::vector<std::shared_ptr<Command>> commands = {};
 
       if (std::find_if(_user_commands.begin(), _user_commands.end(), 
@@ -181,10 +182,13 @@ void Test::parse_test(const std::string filename)
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	auto cmd_args = Utils::remove_first_token(tokens);
-	auto cmd = get_command(cmd_name);
+	Utils::remove_first_token(tokens);
+	auto cmd_args = tokens;
 	
-	cmd->set_args( replace_var_with_val(cmd_args) );
+	replace_variable_with_val(cmd_args);
+
+	auto cmd = get_command(cmd_name);
+	cmd->set_args(cmd_args);
 	commands.push_back(cmd);
       } 
       

@@ -28,12 +28,17 @@ class Variable
     /* Get/set */
     void set_name(const std::string name) 
     { 
-      if (name.front() != '$')
+      if (name.empty())
+      {
+	throw Error("Variable::set_name: empty variable name!");
+      }
+      
+      else if (name.front() != '$')
       {
 	throw Error("Variable::set_name: illegal variable name '" + name + "'! Missing '$'!");
       }
 
-      if (name == "$")
+      else if (name == "$")
       {
 	throw Error("Variable::set_name: illegal variable name '" + name + "'!");
       }
