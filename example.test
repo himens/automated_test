@@ -9,6 +9,11 @@
 	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1)"
 \end
 
+\user_cmd test3 
+	test2 88
+	test 1 1
+\end
+
 \step step1
 	test2 10
 	test 999 1000
@@ -22,4 +27,5 @@
 	set_thrust 1000
 	test2 5
 	check "(($RIGHT_COCKPIT_CONTROL::pds_inserted == 1) && ($RIGHT_COCKPIT_CONTROL::mdlr_open == 0)) || ($AER_HW::ground_speed > 180)"
+	test3
 \end 
