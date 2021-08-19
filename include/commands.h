@@ -14,6 +14,7 @@ class UserCmd : public Command
 {
   public:
     UserCmd() {}
+    UserCmd(const std::string name) : Command(name) {}
     UserCmd(const std::string name, 
 	    const std::vector<std::string> &placeholders, 
 	    const std::vector<std::shared_ptr<Command>> &commands) : Command(name, placeholders.size()) 
@@ -113,12 +114,7 @@ class CheckCmd : public Command
         throw Error("cannot open report file!");
       }
 
-      file << "### CheckCmd report: \n";
-      file << "#### Condition: \n";
-      file << _expr.get_expr() << "\n";
-      file << "#### Result: \n"; 
-      file << (_expr.eval() ? "**PASSED**" : "**FAILED**") << "\n";
-      file << "\n";
+      file << "1. Check: " << _expr.get_expr() << " " << (_expr.eval() ? "**PASSED**" : "**FAILED**") << "\n";
     }
 
   private: 
@@ -135,17 +131,28 @@ class SetThrustCmd : public Command
     void run()
     {
       auto value = this->get_args().at(0);
-      int thrust = Utils::is_digit(value) ? std::stoi(value) : 0;
       if (!Utils::is_digit(value)) 
       {
 	throw Error("SetThrustCmd: value '" + value + "' is not a number!");
       }
 
-      std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
+      _thrust = std::stoi(value);
+      std::cout << "SetThrustCmd: thrust set to " << _thrust << "\n"; 
     }
 
     /* Write command report to file */
-    void write_report(std::ofstream &file) const {}
+    void write_report(std::ofstream &file) const 
+    {
+      if (!file.is_open())
+      {
+        throw Error("cannot open report file!");
+      }
+      
+      file << "1. Thrust set to: " << _thrust << "\n";
+    }
+
+  private:
+    int _thrust = 0; 
 };
 
 /* Insert PDS command */
@@ -155,9 +162,24 @@ class InsertPdsCmd : public Command
     InsertPdsCmd() : Command("insert_pds", 0) {}
 
     /* Run command */
-    void run() { std::cout << "InsertPdsCmd: pds inserted! \n"; }
+    void run() 
+    {
+      _pds_inserted = true;
+      std::cout << "InsertPdsCmd: pds " << (_pds_inserted ? "inserted" : "not inserted") << "\n"; 
+    }
     
     /* Write command report to file */
-    void write_report(std::ofstream &file) const {}
+    void write_report(std::ofstream &file) const 
+    {
+      if (!file.is_open())
+      {
+        throw Error("cannot open report file!");
+      }
+      
+      file << "1. Pds status: " << (_pds_inserted ? "inserted" : "not inserted") << "\n";
+    }
+
+  private:
+    bool _pds_inserted = false; 
 };
 #endif
