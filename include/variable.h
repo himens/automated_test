@@ -17,12 +17,6 @@ class Variable
     Variable(const std::string name) { set_name(name); }
     Variable(const std::string name, const std::string value) : Variable(name) { set_value(value); }
 
-    Variable& operator= (const Variable &var) 
-    { 
-     this->set_name(var.get_name());
-     this->set_value(var.get_value());
-     return *this; 
-    }
     bool operator== (const Variable &var) const { return this->get_name() == var.get_name(); }
 
     /* Get/set */
