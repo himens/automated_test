@@ -113,7 +113,7 @@ void Test::parse_test(const std::string filename)
 
     auto tokens = Utils::tokens(line);
     auto section = tokens[0];
-    Utils::remove_first_token(tokens);
+    Utils::erase_front(tokens);
     auto sect_args = tokens;
 
     /* '\step' section */
@@ -136,7 +136,7 @@ void Test::parse_test(const std::string filename)
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	Utils::remove_first_token(tokens);
+	Utils::erase_front(tokens);
 	auto cmd_args = tokens;
 
 	replace_variable_with_val(cmd_args);
@@ -163,7 +163,7 @@ void Test::parse_test(const std::string filename)
       }
 
       auto name = sect_args[0];
-      Utils::remove_first_token(sect_args);
+      Utils::erase_front(sect_args);
       auto placeholders = sect_args;
       std::vector<std::shared_ptr<Command>> commands = {};
 
@@ -182,7 +182,7 @@ void Test::parse_test(const std::string filename)
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	Utils::remove_first_token(tokens);
+	Utils::erase_front(tokens);
 	auto cmd_args = tokens;
 	
 	replace_variable_with_val(cmd_args);

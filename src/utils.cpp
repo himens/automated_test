@@ -79,10 +79,10 @@ namespace Utils
   }
 
 
-  /**********************/
-  /* Remove first token */
-  /**********************/
-  void remove_first_token(std::vector<std::string> &tokens)
+  /***********************/
+  /* Erase first element */
+  /***********************/
+  void erase_front(std::vector<std::string> &tokens)
   {
     if (tokens.size() > 0) tokens.erase( tokens.begin() );
   }

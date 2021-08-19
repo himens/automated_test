@@ -60,7 +60,7 @@ class UserCmd : public Command
     
     void set_placeholders(const std::vector<std::string> &placeholders) 
     { 
-      auto it = std::find_if(placeholders.begin(), placeholders.end(), [] (std::string s) { return s.front() != '_'; });
+      auto it = std::find_if(placeholders.begin(), placeholders.end(), [] (std::string s) { return !s.empty() && s.front() != '_'; });
       if (it != placeholders.end()) 
       {
 	throw Error("UserCmd::set_placeholders: '" + *it + "' not a placeholder! It should begin with '_'!");

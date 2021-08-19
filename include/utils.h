@@ -27,8 +27,8 @@ namespace Utils
   /* Tokenize line */
   std::vector<std::string> tokens(std::string line, const char delim = ' '); 
   
-  /* Remove first token */
-  void remove_first_token(std::vector<std::string> &tokens);
+  /* Erase first element */
+  void erase_front(std::vector<std::string> &tokens);
   
   /* Remove all char occurrences from string */
   void strip_char(const char c, std::string &str);
