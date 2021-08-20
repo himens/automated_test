@@ -82,8 +82,8 @@ namespace Utils
   /***********************/
   /* Erase first element */
   /***********************/
-  void erase_front(std::vector<std::string> &tokens)
+  void erase_front(std::vector<std::string> &vect)
   {
-    if (tokens.size() > 0) tokens.erase( tokens.begin() );
+    if (vect.size() > 0) vect.erase( vect.begin() );
   }
 };
