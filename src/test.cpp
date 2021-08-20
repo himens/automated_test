@@ -3,26 +3,38 @@
 /************/
 /* Run test */
 /************/
-void Test::run()
+void Test::run(const std::string filename)
 {
+  /* Reset steps */
+  _steps.clear();
+
+  /* Parse test file */
+  parse_test_file(filename);
+
+  /* Create report file */
+  auto pos = filename.find(".test");
+  auto test_name = pos != std::string::npos ? filename.substr(0, pos) : filename;
+  std::ofstream file("report_" + test_name + ".md", std::ios::out);
+
+  /* Run test */
   if (_steps.size() == 0)
   {
-    Utils::print_banner("Test has no steps!");
+    Utils::print_banner("Test '" + test_name + "' does not contain any step!");
+    file << "# Test '" << test_name << "' does not contain any step! \n";
     return;
   }
 
-  std::ofstream file("report.md", std::ios::out);
-
-  Utils::print_banner("Run test!");
-
+  Utils::print_banner("Run test: '" + test_name + "'");
+  file << "# Test: '" + test_name << "' \n";
+  
   for (auto step : _steps) 
   { 
     step.run();
     step.write_report(file);
   }
 
-  file.close();
   Utils::print_banner("Test done!");
+  file.close();
 }
 
 
@@ -64,7 +76,7 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 /*******************/
 /* Parse test file */
 /*******************/
-void Test::parse_test(const std::string filename)
+void Test::parse_test_file(const std::string filename)
 {
   // utility function: remove comments and tabs from line
   auto strip_tabs_and_comments = [] (std::string &line)
@@ -131,9 +143,15 @@ void Test::parse_test(const std::string filename)
     }
   };
 
-  Utils::print_banner("Read file: " + filename);
-
+  /* Check file extension */
+  if (filename.find(".test") == std::string::npos)
+  {
+    throw Error("'" + filename + "' is not a .test file!");
+  }
+  
   /* Open file */
+  Utils::print_banner("Read file: '" + filename + "'");
+
   std::ifstream file(filename, std::ios::in);
   if (!file.good()) 
   {
@@ -243,7 +261,7 @@ void Test::parse_test(const std::string filename)
 	throw SyntaxError("'" + line + "' missing filename!");
       }	
 
-      parse_test(sect_args[0]); // recursive parsing
+      parse_test_file(sect_args[0]); // recursive parsing
     }
     
     /* '\var' section */
@@ -305,7 +323,7 @@ void Test::parse_test(const std::string filename)
     }	
   } // end parse file
 
-  std::cout << "File: " + filename + " read successfully! \n";
+  std::cout << "File '" + filename + "' read successfully! \n";
 }
 
 

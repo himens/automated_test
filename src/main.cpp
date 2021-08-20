@@ -17,8 +17,8 @@ int main(int argc, char **argv)
 
   try
   {
-    Test test(test_file);
-    test.run();
+    Test test;
+    test.run(test_file);
   }
   catch (const Error &e) 
   { 

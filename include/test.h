@@ -9,14 +9,10 @@
 class Test 
 {
   public:
-    Test () {};
-    Test (const std::string filename) { parse_test(filename); };
+    Test() {};
     
-    /* Parse test file */
-    void parse_test(const std::string filename);
-
     /* Run test */
-    void run();
+    void run(const std::string filename);
 
   private:
     /* Make predefined command object */
@@ -33,6 +29,9 @@ class Test
 
     /* Make command object */
     std::shared_ptr<Command> make_command(const std::string name);
+
+    /* Parse test file */
+    void parse_test_file(const std::string filename);
 
   private:
     std::vector<Step> _steps = {};

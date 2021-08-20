@@ -13,7 +13,7 @@ class Step
     {
       if (_commands.size() == 0)
       {
-	std::cout << "Step '" << _name << "' has not commands to run!\n";
+	std::cout << "Step '" << _name << "' does not contain any command!\n";
 	return;
       }
 
@@ -35,8 +35,15 @@ class Step
         throw Error("cannot open report file!");
       }
 
-      file << "## Report of step: " << _name << "\n";
-      for (auto cmd : _commands) cmd->write_report(file);
+      file << "## Report of step: '" << _name << "' \n";
+      if (_commands.size() == 0)
+      {
+	file << "### Step: '" << _name << "' does not contain any command! \n";
+      }
+      else
+      {
+	for (auto cmd : _commands) cmd->write_report(file);
+      }
     }
 
     /* Set/get */
