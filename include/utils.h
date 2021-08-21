@@ -7,7 +7,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <memory>
 #include <algorithm>
 
 /***********/

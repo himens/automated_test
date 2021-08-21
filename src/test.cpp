@@ -67,9 +67,9 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 }
 
 
-/********************/
-/* Add user command */
-/********************/
+/***********/
+/* Set/get */
+/***********/
 void Test::add_user_command(const UserCmd &usr_cmd)
 {
   if (std::find_if(_user_commands.begin(), _user_commands.end(), 
@@ -79,6 +79,26 @@ void Test::add_user_command(const UserCmd &usr_cmd)
   }
 
   _user_commands.push_back(usr_cmd);
+}
+
+void Test::set_steps(const std::vector<Step> &steps) 
+{ 
+  for (const auto &step : steps) add_step(step); 
+}
+
+void Test::set_name(const std::string name) 
+{ 
+  if (name.empty()) 
+  {
+    throw Error("Test::set_name: name is empty!");
+  }
+
+  _name = name; 
+}
+
+void Test::set_user_commands(const std::vector<UserCmd> commands)
+{
+  for (const auto &cmd : commands) add_user_command(cmd);
 }
 
 
@@ -139,8 +159,8 @@ void Test::read(const std::string filename)
     {
       if (!arg.empty() && arg.front() == '$') 
       {
-	auto it = std::find(_variables.begin(), _variables.end(), Variable{arg});
-	if (it != _variables.end()) 
+	auto it = std::find(_read_variables.begin(), _read_variables.end(), Variable{arg});
+	if (it != _read_variables.end()) 
 	{
 	  arg = it->get_value();
 	}
@@ -278,13 +298,13 @@ void Test::read(const std::string filename)
       auto name = sect_args[0];
       auto value = sect_args[2];
 
-      auto it = std::find(_variables.begin(), _variables.end(), Variable{name});
-      if (it != _variables.end()) 
+      auto it = std::find(_read_variables.begin(), _read_variables.end(), Variable{name});
+      if (it != _read_variables.end()) 
       {
 	throw SyntaxError("variable '" + name + "' already defined!");
       }
 
-      _variables.push_back({name, value});
+      _read_variables.push_back({name, value});
     }
 
     /* Unknown section */

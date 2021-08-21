@@ -1,10 +1,13 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include <memory>
+
 #include "utils.h"
-#include "commands.h"
+#include "user_command.h"
 #include "variable.h"
 #include "step.h"
+#include "predefined_cmd.h"
 
 class Test 
 {
@@ -24,25 +27,9 @@ class Test
     /* Set/get */
     void add_user_command(const UserCmd &cmd);
     void add_step(const Step &step) { _steps.push_back(step); }
-    void set_steps(const std::vector<Step> &steps) 
-    { 
-      for (const auto &step : steps) add_step(step); 
-    }
-    
-    void set_name(const std::string name) 
-    { 
-      if (name.empty()) 
-      {
-	throw Error("Test::set_name: name is empty!");
-      }
-
-      _name = name; 
-    }
-    
-    void set_user_commands(const std::vector<UserCmd> commands)
-    {
-      for (const auto &cmd : commands) add_user_command(cmd);
-    }
+    void set_steps(const std::vector<Step> &steps); 
+    void set_name(const std::string name); 
+    void set_user_commands(const std::vector<UserCmd> commands);
 
     const std::vector<Step>& get_steps() const { return _steps; }
     const std::string get_name() const { return _name; }
@@ -65,6 +52,6 @@ class Test
     std::string _name;
     std::vector<Step> _steps = {};
     std::vector<UserCmd> _user_commands = {};
-    std::vector<Variable> _variables = {};
+    std::vector<Variable> _read_variables = {};
 };
 #endif
