@@ -1,19 +1,15 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <memory>
-
-#include "utils.h"
 #include "user_command.h"
-#include "variable.h"
 #include "step.h"
 #include "predefined_cmd.h"
 
 class Test 
 {
   public:
-    Test() {};
-    Test(const std::string name) { set_name(name); };
+    Test();
+    Test(const std::string name);
     
     /* Run test */
     void run();
@@ -27,6 +23,7 @@ class Test
     /* Set/get */
     void add_user_command(const UserCmd &cmd);
     void add_step(const Step &step);
+
     void set_steps(const std::vector<Step> &steps); 
     void set_name(const std::string name); 
     void set_user_commands(const std::vector<UserCmd> commands);

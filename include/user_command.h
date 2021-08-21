@@ -11,21 +11,16 @@
 class UserCmd : public Command
 {
   public:
-    UserCmd() {}
-    UserCmd(const size_t n) : Command(n) {}
+    UserCmd();
+
+    UserCmd(const size_t n);
 
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &placeholders) : Command(name, placeholders.size()) 
-    { 
-      set_placeholders(placeholders); 
-    }
+	    const std::vector<std::string> &placeholders);
 
     UserCmd(const std::string name, 
   	    const std::vector<std::string> &placeholders, 
-	    const std::vector<std::shared_ptr<Command>> &commands) : UserCmd(name, placeholders) 
-    { 
-      set_commands(commands); 
-    } 
+	    const std::vector<std::shared_ptr<Command>> &commands);
 
     /* Run command */
     void run();
@@ -35,6 +30,7 @@ class UserCmd : public Command
 
     /* Set/get */
     void add_command(const std::shared_ptr<Command> cmd);
+
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
     void set_placeholders(const std::vector<std::string> &placeholders);
     

@@ -1,5 +1,16 @@
 #include "test.h"
 
+/**********/
+/* Constr */
+/**********/
+Test::Test() {};
+
+Test::Test(const std::string name) 
+{ 
+  set_name(name); 
+};
+
+
 /************/
 /* Run test */
 /************/
@@ -140,17 +151,17 @@ void Test::read(const std::string filename)
 
     if (line.front() == '\\') // section inside body
     {
-      throw SyntaxError("'" + line + "' section declaration inside body! Maybe '\\end' is missing?");
+      throw Error("syntax error: '" + line + "' section declaration inside body! Maybe '\\end' is missing?");
     }
 
     auto tabs = std::count(line.begin(), line.end(), '\t'); // 1-tab indentation if not a comment line
     if (!tabs) 
     {
-      throw SyntaxError("line '" + line + "' not indented (tab missing)!");
+      throw Error("syntax error: line '" + line + "' not indented (tab missing)!");
     }
     else if (tabs > 1) 
     {
-      throw SyntaxError("line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
+      throw Error("syntax error: line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
     }
   };
 
@@ -168,7 +179,7 @@ void Test::read(const std::string filename)
 	}
 	else 
 	{
-	  throw SyntaxError("variable '" + arg + "' not defined!");
+	  throw Error("syntax error: variable '" + arg + "' not defined!");
 	}
       }
     }
@@ -199,7 +210,7 @@ void Test::read(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	throw SyntaxError("'" + line + "' missing step name!");
+	throw Error("syntax error: '" + line + "' missing step name!");
       }
 
       auto name = sect_args[0];
@@ -226,7 +237,7 @@ void Test::read(const std::string filename)
 
       if (!is_end_of_section(line)) 
       {
-	throw SyntaxError("cannot find '\\end' of '" + section + " " + name + "'!"); 
+	throw Error("syntax error: cannot find '\\end' of '" + section + " " + name + "'!"); 
       }
 
       _steps.push_back({name, commands});
@@ -237,7 +248,7 @@ void Test::read(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	throw SyntaxError("'" + line + "' missing command name!");
+	throw Error("syntax error: '" + line + "' missing command name!");
       }
 
       auto name = sect_args[0];
@@ -267,7 +278,7 @@ void Test::read(const std::string filename)
       
       if (!is_end_of_section(line)) 
       {
-	throw SyntaxError("cannot find '\\end' of '" + section + " " + name + "'!"); 
+	throw Error("syntax error: cannot find '\\end' of '" + section + " " + name + "'!"); 
       }
       
       add_user_command(usr_cmd);
@@ -278,7 +289,7 @@ void Test::read(const std::string filename)
     {
       if (sect_args.size() == 0)
       {
-	throw SyntaxError("'" + line + "' missing filename!");
+	throw Error("syntax error: '" + line + "' missing filename!");
       }	
 
       read(sect_args[0]); // recursive parsing
@@ -289,12 +300,12 @@ void Test::read(const std::string filename)
     {
       if (sect_args.size() != 3)
       {
-	throw SyntaxError("'" + line + "' missing arguments!");
+	throw Error("syntax error: '" + line + "' missing arguments!");
       }
 
       if (sect_args[1] != ":=") 
       {
-	throw SyntaxError("'" + line + "' missing assignment operator ':='!");
+	throw Error("syntax error: '" + line + "' missing assignment operator ':='!");
       }
 
       auto name = sect_args[0];
@@ -303,7 +314,7 @@ void Test::read(const std::string filename)
       auto it = std::find(_read_variables.begin(), _read_variables.end(), Variable{name});
       if (it != _read_variables.end()) 
       {
-	throw SyntaxError("variable '" + name + "' already defined!");
+	throw Error("syntax error: variable '" + name + "' already defined!");
       }
 
       _read_variables.push_back({name, value});
@@ -312,7 +323,7 @@ void Test::read(const std::string filename)
     /* Unknown section */
     else 
     {
-      throw SyntaxError("unknown section '" + section + "'!");
+      throw Error("syntax error: unknown section '" + section + "'!");
     }	
   } // end parse file
 

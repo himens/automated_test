@@ -10,9 +10,9 @@
 class Step
 {
   public:
-    Step () {}
-    Step (const std::string name) { set_name(name); }
-    Step (const std::string name, std::vector<std::shared_ptr<Command>> &commands) : Step(name) { set_commands(commands); }
+    Step ();
+    Step (const std::string name);
+    Step (const std::string name, std::vector<std::shared_ptr<Command>> &commands);
 
     /* Run step */
     void run();
@@ -22,6 +22,7 @@ class Step
     
     /* Set/get */
     void add_command(const std::shared_ptr<Command> cmd);
+
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
     void set_name(const std::string name); 
 

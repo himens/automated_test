@@ -205,6 +205,32 @@ namespace Detail
 };
 
 
+/**********/
+/* Constr */
+/**********/
+LogicalExpr::LogicalExpr() {};
+
+LogicalExpr::LogicalExpr(const std::string expr, const std::vector<Variable> &variables) 
+{
+  set_expr(expr);
+  set_variables(variables);
+}
+
+
+/***********/
+/* Set/get */
+/***********/
+void LogicalExpr::set_expr(const std::string expr) 
+{ 
+  _expr = expr; 
+}
+
+void LogicalExpr::set_variables(const std::vector<Variable> &variables) 
+{ 
+  _variables = variables; 
+}
+
+
 /*******************************/
 /* Evaluate logical expression */
 /*******************************/

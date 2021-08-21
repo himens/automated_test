@@ -1,5 +1,21 @@
 #include "command.h"
 
+/**********/
+/* Constr */
+/**********/
+Command::Command() {};
+
+Command::Command(const size_t n) 
+{ 
+  _args.resize(n); 
+}
+
+Command::Command(const std::string name, const size_t n) : Command(n) 
+{ 
+  set_name(name);
+}
+
+
 /***********/
 /* Set/get */
 /***********/

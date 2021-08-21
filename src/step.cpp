@@ -1,5 +1,21 @@
 #include "step.h"
 
+/**********/
+/* Constr */
+/**********/
+Step::Step () {}
+
+Step::Step (const std::string name) 
+{ 
+  set_name(name); 
+}
+
+Step::Step (const std::string name, std::vector<std::shared_ptr<Command>> &commands) : Step(name) 
+{ 
+  set_commands(commands); 
+}
+
+
 /************/
 /* Run step */
 /************/

@@ -13,9 +13,9 @@
 class Command
 {
   public:
-    Command() {};
-    Command(const size_t n) { _args.resize(n); }
-    Command(const std::string name, const size_t n) : Command(n) { set_name(name); }
+    Command();
+    Command(const size_t n);
+    Command(const std::string name, const size_t n);
 
     /* Run command */
     virtual void run() = 0;

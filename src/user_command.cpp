@@ -1,5 +1,26 @@
 #include "user_command.h"
 
+/**********/
+/* Constr */
+/**********/
+UserCmd::UserCmd() {}
+
+UserCmd::UserCmd(const size_t n) : Command(n) {}
+
+UserCmd::UserCmd(const std::string name, 
+    const std::vector<std::string> &placeholders) : Command(name, placeholders.size()) 
+{ 
+  set_placeholders(placeholders); 
+}
+
+UserCmd::UserCmd(const std::string name, 
+    const std::vector<std::string> &placeholders, 
+    const std::vector<std::shared_ptr<Command>> &commands) : UserCmd(name, placeholders) 
+{ 
+  set_commands(commands); 
+} 
+
+ 
 /***************/
 /* Run command */
 /***************/
