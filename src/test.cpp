@@ -36,11 +36,6 @@ void Test::add_step(const Step &step)
   _steps.push_back(step); 
 }
 
-void Test::set_steps(const std::vector<Step> &steps) 
-{ 
-  for (const auto &step : steps) add_step(step); 
-}
-
 void Test::set_name(const std::string name) 
 { 
   if (name.empty()) 
@@ -49,6 +44,11 @@ void Test::set_name(const std::string name)
   }
 
   _name = name; 
+}
+
+void Test::set_steps(const std::vector<Step> &steps) 
+{ 
+  for (const auto &step : steps) add_step(step); 
 }
 
 void Test::set_user_commands(const std::vector<UserCmd> commands)
