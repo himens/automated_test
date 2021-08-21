@@ -177,11 +177,13 @@ namespace Detail
       // push variable operand on stack
       else if (c == "$")
       {
-	std::string var{c};
+	std::string name{c};
 
-	while ((i+1 < postfix.length()) && postfix[i+1] != ' ') var += postfix[++i];
+	while ((i+1 < postfix.length()) && postfix[i+1] != ' ') name += postfix[++i];
 	
-	auto it = std::find(variables.begin(), variables.end(), Variable{var});
+	auto it = std::find_if(variables.begin(), variables.end(), 
+	    [&] (Variable var) { return var.get_name() == name; });
+
 	if (it != variables.end())
 	{
 	  s.push(std::stof(it->get_value()));
@@ -189,7 +191,7 @@ namespace Detail
 	}
 	else
 	{
-	  throw Error("eval_postfix: unknown variable '" + var + "'! Cannot be replaced by value!"); 
+	  throw Error("eval_postfix: unknown variable '" + name + "'! Cannot be replaced by value!"); 
 	}
       }
     }

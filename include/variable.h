@@ -17,9 +17,6 @@ class Variable
     Variable(const std::string name);
     Variable(const std::string name, const std::string value);
 
-    /* Overloads */
-    bool operator== (const Variable &var) const;
-
     /* Get/set */
     void set_value(const std::string value);
     void set_name(const std::string name); 

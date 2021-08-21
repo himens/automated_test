@@ -16,15 +16,6 @@ Variable::Variable(const std::string name, const std::string value) : Variable(n
 }
 
 
-/*************/
-/* overloads */
-/*************/
-bool Variable::operator== (const Variable &var) const 
-{
-  return this->get_name() == var.get_name(); 
-}
-
-
 /***********/
 /* Get/set */
 /***********/

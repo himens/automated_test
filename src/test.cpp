@@ -181,7 +181,9 @@ void Test::read_test_file(const std::string filename)
     {
       if (!arg.empty() && arg.front() == '$') 
       {
-	auto it = std::find(_read_variables.begin(), _read_variables.end(), Variable{arg});
+	auto it = std::find_if(_read_variables.begin(), _read_variables.end(), 
+	    [&] (Variable var) { return var.get_name() == arg; });
+
 	if (it != _read_variables.end()) 
 	{
 	  arg = it->get_value();
@@ -319,7 +321,9 @@ void Test::read_test_file(const std::string filename)
       auto name = sect_args[0];
       auto value = sect_args[2];
 
-      auto it = std::find(_read_variables.begin(), _read_variables.end(), Variable{name});
+      auto it = std::find_if(_read_variables.begin(), _read_variables.end(), 
+	  [&] (Variable var) { return var.get_name() == name; });
+
       if (it != _read_variables.end()) 
       {
 	throw Error("syntax error: variable '" + name + "' already defined!");
