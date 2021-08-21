@@ -92,7 +92,10 @@ void Test::add_user_command(const UserCmd &usr_cmd)
   _user_commands.push_back(usr_cmd);
 }
 
-void Test::add_step(const Step &step) { _steps.push_back(step); }
+void Test::add_step(const Step &step) 
+{ 
+  _steps.push_back(step); 
+}
 
 void Test::set_steps(const std::vector<Step> &steps) 
 { 
