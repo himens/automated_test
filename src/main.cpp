@@ -11,14 +11,15 @@ int main(int argc, char **argv)
       break;
 
     default:  
-      std::cout << "Usage: ./test.exe [test file] \n";
+      std::cout << "Usage: " + std::string{argv[0]} + " [test file] \n";
       return 0;
   }
 
   try
   {
-    Test test;
-    test.run(test_file);
+    Test test{"test"};
+    test.read(test_file);
+    test.run();
   }
   catch (const Error &e) 
   { 

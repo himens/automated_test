@@ -10,9 +10,31 @@ class Test
 {
   public:
     Test() {};
+    Test(const std::string name) { set_name(name); };
     
     /* Run test */
-    void run(const std::string filename);
+    void run();
+
+    /* Read test file */
+    void read(const std::string filename);
+
+    /* Make command object */
+    std::shared_ptr<Command> make_command(const std::string name);
+
+    /* Set/get */
+    void set_steps(const std::vector<Step> &steps) { _steps = steps; }
+    void set_name(const std::string name) 
+    { 
+      if (name.empty()) 
+      {
+	throw Error("Test::set_name: name is empty!");
+      }
+
+      _name = name; 
+    }
+
+    const std::vector<Step>& get_steps() const { return _steps; }
+    const std::string get_name() const { return _name; }
 
   private:
     /* Make predefined command object */
@@ -27,13 +49,8 @@ class Test
       return cmd;
     }
 
-    /* Make command object */
-    std::shared_ptr<Command> make_command(const std::string name);
-
-    /* Parse test file */
-    void parse_test_file(const std::string filename);
-
   private:
+    std::string _name;
     std::vector<Step> _steps = {};
     std::vector<UserCmd> _user_commands = {};
     std::vector<Variable> _variables = {};

@@ -3,37 +3,31 @@
 /************/
 /* Run test */
 /************/
-void Test::run(const std::string filename)
+void Test::run()
 {
-  /* Reset steps */
-  _steps.clear();
-
-  /* Parse test file */
-  parse_test_file(filename);
-
   /* Create report file */
-  auto pos = filename.find(".test");
-  auto test_name = pos != std::string::npos ? filename.substr(0, pos) : filename;
-  std::ofstream file("report_" + test_name + ".md", std::ios::out);
+  std::ofstream file("report_" + _name + ".md", std::ios::out);
+  file << "# Test: '" + _name << "' \n";
 
   /* Run test */
-  if (_steps.size() == 0)
+  if (_steps.size() > 0)
   {
-    Utils::print_banner("Test '" + test_name + "' does not contain any step!");
-    file << "# Test '" << test_name << "' does not contain any step! \n";
-    return;
+    Utils::print_banner("Run test: '" + _name + "'");
+
+    for (auto step : _steps) 
+    { 
+      step.run();
+      step.write_report(file);
+    }
+
+    Utils::print_banner("Test done!");
+  }
+  else
+  {
+    Utils::print_banner("Test '" + _name + "' does not contain any step!");
+    file << "## Test '" << _name << "' does not contain any step! \n";
   }
 
-  Utils::print_banner("Run test: '" + test_name + "'");
-  file << "# Test: '" + test_name << "' \n";
-  
-  for (auto step : _steps) 
-  { 
-    step.run();
-    step.write_report(file);
-  }
-
-  Utils::print_banner("Test done!");
   file.close();
 }
 
@@ -45,7 +39,7 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 {
   auto cmd = make_predefined_cmd(name);
 
-  if (!cmd) // check if cmd name is an user-command...
+  if (cmd == nullptr) // check if cmd name is an user-command...
   {
     auto it = std::find_if(_user_commands.begin(), _user_commands.end(), 
 	[&] (UserCmd cmd) { return name == cmd.get_name(); });
@@ -73,10 +67,10 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 }
 
 
-/*******************/
-/* Parse test file */
-/*******************/
-void Test::parse_test_file(const std::string filename)
+/******************/
+/* Read test file */
+/******************/
+void Test::read(const std::string filename)
 {
   // utility function: remove comments and tabs from line
   auto strip_tabs_and_comments = [] (std::string &line)
@@ -143,12 +137,6 @@ void Test::parse_test_file(const std::string filename)
     }
   };
 
-  /* Check file extension */
-  if (filename.find(".test") == std::string::npos)
-  {
-    throw Error("'" + filename + "' is not a .test file!");
-  }
-  
   /* Open file */
   Utils::print_banner("Read file: '" + filename + "'");
 
@@ -261,7 +249,7 @@ void Test::parse_test_file(const std::string filename)
 	throw SyntaxError("'" + line + "' missing filename!");
       }	
 
-      parse_test_file(sect_args[0]); // recursive parsing
+      read(sect_args[0]); // recursive parsing
     }
     
     /* '\var' section */
@@ -325,6 +313,4 @@ void Test::parse_test_file(const std::string filename)
 
   std::cout << "File '" + filename + "' read successfully! \n";
 }
-
-
 

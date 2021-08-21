@@ -11,20 +11,21 @@ class Step
     /* Run step */
     void run()
     {
-      if (_commands.size() == 0)
+      if (_commands.size() > 0)
+      {
+	Utils::print_banner("Run step '" + _name + "':");
+
+	for (auto cmd : _commands)
+	{
+	  std::cout << "Run command '" << cmd->get_name() << "':\n";
+	  cmd->run();
+	  std::cout << "\n";
+	}
+      }
+      else
       {
 	std::cout << "Step '" << _name << "' does not contain any command!\n";
-	return;
-      }
-
-      Utils::print_banner("Run step '" + _name + "':");
-
-      for (auto cmd : _commands)
-      {
-	std::cout << "Run command '" << cmd->get_name() << "':\n";
-	cmd->run();
-	std::cout << "\n";
-      }
+      } 
     }
 
     /* Write step report to file */
@@ -36,13 +37,14 @@ class Step
       }
 
       file << "## Report of step: '" << _name << "' \n";
-      if (_commands.size() == 0)
+
+      if (_commands.size() > 0)
       {
-	file << "### Step: '" << _name << "' does not contain any command! \n";
+	for (auto cmd : _commands) cmd->write_report(file);
       }
       else
       {
-	for (auto cmd : _commands) cmd->write_report(file);
+	file << "### Step: '" << _name << "' does not contain any command! \n";
       }
     }
 
