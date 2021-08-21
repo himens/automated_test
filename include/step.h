@@ -49,6 +49,21 @@ class Step
     }
 
     /* Set/get */
+    void add_command(const std::shared_ptr<Command> cmd) 
+    {
+      if (cmd == nullptr) 
+      {
+	throw Error("Step::add_command: try to add nullptr to step '" + _name + "'!");
+      }
+
+      _commands.push_back(cmd);
+    }
+
+    void set_commands(const std::vector<std::shared_ptr<Command>> &commands) 
+    { 
+      for (const auto &cmd : commands) add_command(cmd); 
+    }
+
     void set_name(const std::string name) 
     { 
       if (name.empty()) 
@@ -59,10 +74,8 @@ class Step
       _name = name; 
     }
 
-    void set_commands(const std::vector<std::shared_ptr<Command>> &commands) { _commands = commands; }
-
-    const std::string get_name() const { return _name; }
     const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }
+    const std::string get_name() const { return _name; }
 
   private:
     std::string _name;

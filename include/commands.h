@@ -6,22 +6,27 @@
 #include "variable.h"
 #include "logical_expr.h"
 
-/* UserCmd class: define a user-command which is a set of already existing commands 
-   plus placeholders which stands for numeric arguments to be passed when called. 
-   The user-command can be seen as new function with its arguments.
+/* UserCmd class: define a user-command which can be seen as new command with its own arguments.
+   It's a set of already existing commands plus placeholders which stand for user-command arguments. 
  */
 class UserCmd : public Command
 {
   public:
     UserCmd() {}
-    UserCmd(const std::string name) : Command(name) {}
+    UserCmd(const size_t n) : Command(n) {}
+
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &placeholders, 
-	    const std::vector<std::shared_ptr<Command>> &commands) : Command(name, placeholders.size()) 
+	    const std::vector<std::string> &placeholders) : Command(name, placeholders.size()) 
     { 
-      set_placeholders(placeholders);
-      set_commands(commands);
+      set_placeholders(placeholders); 
     }
+
+    UserCmd(const std::string name, 
+  	    const std::vector<std::string> &placeholders, 
+	    const std::vector<std::shared_ptr<Command>> &commands) : UserCmd(name, placeholders) 
+    { 
+      set_commands(commands); 
+    } 
 
     /* Run command */
     void run()
@@ -57,15 +62,35 @@ class UserCmd : public Command
     }
 
     /* Set/get */
-    void set_commands(const std::vector<std::shared_ptr<Command>> &commands) { _commands = commands; }
-    
+    void add_command(const std::shared_ptr<Command> cmd) 
+    {
+      if (cmd == nullptr) 
+      {
+	throw Error("UserCmd::add_command: try to add nullptr to command '" + this->get_name() + "'!");
+      }
+
+      _commands.push_back(cmd);
+    }
+
+    void set_commands(const std::vector<std::shared_ptr<Command>> &commands) 
+    { 
+      for (const auto &cmd : commands) add_command(cmd); 
+    }
+
     void set_placeholders(const std::vector<std::string> &placeholders) 
     { 
       auto it = std::find_if(placeholders.begin(), placeholders.end(), 
 	  [] (std::string s) { return s.empty() || (!s.empty() && s.front() != '_'); });
+
       if (it != placeholders.end()) 
       {
 	throw Error("UserCmd::set_placeholders: '" + *it + "' not a placeholder! It should begin with '_'!");
+      }
+
+      if (placeholders.size() != this->get_args().size())
+      {
+	throw Error("UserCmd::set_placeholders: command '" + this->get_name() + "' needs " + std::to_string(this->get_args().size()) 
+	    + " placeholders, " + std::to_string(placeholders.size()) + " provided!");
       }
 
       _placeholders = placeholders;

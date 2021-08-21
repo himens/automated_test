@@ -22,7 +22,13 @@ class Test
     std::shared_ptr<Command> make_command(const std::string name);
 
     /* Set/get */
-    void set_steps(const std::vector<Step> &steps) { _steps = steps; }
+    void add_user_command(const UserCmd &cmd);
+    void add_step(const Step &step) { _steps.push_back(step); }
+    void set_steps(const std::vector<Step> &steps) 
+    { 
+      for (const auto &step : steps) add_step(step); 
+    }
+    
     void set_name(const std::string name) 
     { 
       if (name.empty()) 
@@ -32,9 +38,15 @@ class Test
 
       _name = name; 
     }
+    
+    void set_user_commands(const std::vector<UserCmd> commands)
+    {
+      for (const auto &cmd : commands) add_user_command(cmd);
+    }
 
     const std::vector<Step>& get_steps() const { return _steps; }
     const std::string get_name() const { return _name; }
+    const std::vector<UserCmd>& get_user_commands() { return _user_commands; } 
 
   private:
     /* Make predefined command object */

@@ -2,7 +2,6 @@
 \include my_commands.test 
 
 \var $var1 := 18
-\set $var1 := 77
 
 \user_cmd test2 _x
 	test $var1 _x 

@@ -20,6 +20,7 @@ class Variable
     bool operator== (const Variable &var) const { return this->get_name() == var.get_name(); }
 
     /* Get/set */
+    void set_value(const std::string value) { _value = value; }
     void set_name(const std::string name) 
     { 
       if (name.empty())
@@ -40,10 +41,8 @@ class Variable
       _name = name; 
     }
 
-    void set_value(const std::string value) { _value = value; }
-
-    const std::string get_name() const { return _name; }
     const std::string get_value() const { return _value; }
+    const std::string get_name() const { return _name; }
 
   private:
     std::string _name;
