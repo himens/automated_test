@@ -23,11 +23,11 @@ class Step
     /* Set/get */
     void add_command(const std::shared_ptr<Command> cmd);
 
-    void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
     void set_name(const std::string name); 
+    void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
 
-    const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }
     const std::string get_name() const { return _name; }
+    const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }
 
   private:
     std::string _name;

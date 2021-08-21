@@ -24,12 +24,12 @@ class Test
     void add_user_command(const UserCmd &cmd);
     void add_step(const Step &step);
 
-    void set_steps(const std::vector<Step> &steps); 
     void set_name(const std::string name); 
+    void set_steps(const std::vector<Step> &steps); 
     void set_user_commands(const std::vector<UserCmd> commands);
 
-    const std::vector<Step>& get_steps() const { return _steps; }
     const std::string get_name() const { return _name; }
+    const std::vector<Step>& get_steps() const { return _steps; }
     const std::vector<UserCmd>& get_user_commands() { return _user_commands; } 
 
   private:

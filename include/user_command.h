@@ -11,8 +11,6 @@
 class UserCmd : public Command
 {
   public:
-    UserCmd();
-
     UserCmd(const size_t n);
 
     UserCmd(const std::string name, 

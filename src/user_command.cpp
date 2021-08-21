@@ -3,8 +3,6 @@
 /**********/
 /* Constr */
 /**********/
-UserCmd::UserCmd() {}
-
 UserCmd::UserCmd(const size_t n) : Command(n) {}
 
 UserCmd::UserCmd(const std::string name, 

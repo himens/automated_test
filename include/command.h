@@ -13,7 +13,6 @@
 class Command
 {
   public:
-    Command();
     Command(const size_t n);
     Command(const std::string name, const size_t n);
 

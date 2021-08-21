@@ -3,8 +3,6 @@
 /**********/
 /* Constr */
 /**********/
-Command::Command() {};
-
 Command::Command(const size_t n) 
 { 
   _args.resize(n); 
