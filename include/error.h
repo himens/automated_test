@@ -14,7 +14,7 @@ class Error : public std::exception
     Error(const std::string &msg);
     const char* what() const throw ();
 
-  protected:
+  private:
     std::string _msg; // error message
 };
 #endif
