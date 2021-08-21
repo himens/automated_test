@@ -69,7 +69,7 @@ void Step::add_command(const std::shared_ptr<Command> cmd)
 {
   if (cmd == nullptr) 
   {
-    throw Error("Step::add_command: try to add nullptr to step '" + _name + "'!");
+    throw Error("Step::add_command: try to add nullptr command to step '" + _name + "'!");
   }
 
   _commands.push_back(cmd);

@@ -11,6 +11,52 @@ Test::Test(const std::string name)
 };
 
 
+/***********/
+/* Set/get */
+/***********/
+void Test::add_user_command(const UserCmd &usr_cmd)
+{
+  if (std::find_if(_user_commands.begin(), _user_commands.end(), 
+	[&] (UserCmd cmd) { return cmd.get_name() == usr_cmd.get_name(); }) != _user_commands.end())
+  {
+    throw Error("Test::add_user_command: user-command '" + usr_cmd.get_name() + "' already defined!"); 
+  }
+
+  _user_commands.push_back(usr_cmd);
+}
+
+void Test::add_step(const Step &step) 
+{ 
+  if (std::find_if(_steps.begin(), _steps.end(), 
+	[&] (Step s) { return s.get_name() == step.get_name(); }) != _steps.end())
+  {
+    throw Error("Test::add_step: step '" + step.get_name() + "' already defined!"); 
+  }
+
+  _steps.push_back(step); 
+}
+
+void Test::set_steps(const std::vector<Step> &steps) 
+{ 
+  for (const auto &step : steps) add_step(step); 
+}
+
+void Test::set_name(const std::string name) 
+{ 
+  if (name.empty()) 
+  {
+    throw Error("Test::set_name: name is empty!");
+  }
+
+  _name = name; 
+}
+
+void Test::set_user_commands(const std::vector<UserCmd> commands)
+{
+  for (const auto &cmd : commands) add_user_command(cmd);
+}
+
+
 /************/
 /* Run test */
 /************/
@@ -78,50 +124,10 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 }
 
 
-/***********/
-/* Set/get */
-/***********/
-void Test::add_user_command(const UserCmd &usr_cmd)
-{
-  if (std::find_if(_user_commands.begin(), _user_commands.end(), 
-	[&] (UserCmd cmd) { return cmd.get_name() == usr_cmd.get_name(); }) != _user_commands.end())
-  {
-    throw Error("user command '" + usr_cmd.get_name() + "' already defined!"); 
-  }
-
-  _user_commands.push_back(usr_cmd);
-}
-
-void Test::add_step(const Step &step) 
-{ 
-  _steps.push_back(step); 
-}
-
-void Test::set_steps(const std::vector<Step> &steps) 
-{ 
-  for (const auto &step : steps) add_step(step); 
-}
-
-void Test::set_name(const std::string name) 
-{ 
-  if (name.empty()) 
-  {
-    throw Error("Test::set_name: name is empty!");
-  }
-
-  _name = name; 
-}
-
-void Test::set_user_commands(const std::vector<UserCmd> commands)
-{
-  for (const auto &cmd : commands) add_user_command(cmd);
-}
-
-
 /******************/
 /* Read test file */
 /******************/
-void Test::read(const std::string filename)
+void Test::read_test_file(const std::string filename)
 {
   // utility function: remove comments and tabs from line
   auto strip_tabs_and_comments = [] (std::string &line)
@@ -217,7 +223,7 @@ void Test::read(const std::string filename)
       }
 
       auto name = sect_args[0];
-      std::vector<std::shared_ptr<Command>> commands = {};
+      Step step{name};
 
       /* Parse body */
       while (std::getline(file, line) && !is_end_of_section(line))
@@ -235,7 +241,7 @@ void Test::read(const std::string filename)
 
 	auto cmd = make_command(cmd_name);
 	cmd->set_args(cmd_args);
-	commands.push_back(cmd);
+        step.add_command(cmd);
       } 
 
       if (!is_end_of_section(line)) 
@@ -243,7 +249,7 @@ void Test::read(const std::string filename)
 	throw Error("syntax error: cannot find '\\end' of '" + section + " " + name + "'!"); 
       }
 
-      _steps.push_back({name, commands});
+      add_step(step);
     }
 
     /* '\user_cmd' section */
@@ -257,7 +263,6 @@ void Test::read(const std::string filename)
       auto name = sect_args[0];
       Utils::erase_front(sect_args);
       auto placeholders = sect_args;
-
       UserCmd usr_cmd{name, placeholders};
 
       /* Parse body */ 
@@ -295,7 +300,7 @@ void Test::read(const std::string filename)
 	throw Error("syntax error: '" + line + "' missing filename!");
       }	
 
-      read(sect_args[0]); // recursive parsing
+      read_test_file(sect_args[0]); // recursive parsing
     }
     
     /* '\var' section */

@@ -65,7 +65,7 @@ void UserCmd::add_command(const std::shared_ptr<Command> cmd)
 {
   if (cmd == nullptr) 
   {
-    throw Error("UserCmd::add_command: try to add nullptr to command '" + this->get_name() + "'!");
+    throw Error("UserCmd::add_command: try to add nullptr command to user-command '" + this->get_name() + "'!");
   }
 
   _commands.push_back(cmd);

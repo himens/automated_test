@@ -15,7 +15,7 @@ class Test
     void run();
 
     /* Read test file */
-    void read(const std::string filename);
+    void read_test_file(const std::string filename);
 
     /* Make command object */
     std::shared_ptr<Command> make_command(const std::string name);
