@@ -26,7 +26,7 @@ class Test
 
     /* Set/get */
     void add_user_command(const UserCmd &cmd);
-    void add_step(const Step &step) { _steps.push_back(step); }
+    void add_step(const Step &step);
     void set_steps(const std::vector<Step> &steps); 
     void set_name(const std::string name); 
     void set_user_commands(const std::vector<UserCmd> commands);
