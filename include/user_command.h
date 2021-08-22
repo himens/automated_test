@@ -5,8 +5,21 @@
 
 #include "command.h"
 
-/* UserCmd class: define a user-command which can be seen as new command with its own arguments.
+/* UserCmd class: it can be seen as a new command with its own arguments.
    It's a set of already existing commands plus placeholders which stand for user-command arguments. 
+   Example: 
+   > UserCmd my_cmd{"my_cmd", {"_x", "_y"}}; // my_cmd takes two input arguments
+   >
+   > std::shared_ptr<Command> cmd1 = std::make_shared<SetThrustCmd>();
+   > std::shared_ptr<Command> cmd2 = std::make_shared<SetThrustCmd>();
+   > std::shared_ptr<Command> cmd3 = std::make_shared<InsertPdsCmd>();
+   >
+   > cmd1->set_args("_x");
+   > cmd2->set_args("_y");
+   >
+   > usr_cmd->set_commands({cmd1, cmd2, cmd3});
+   > usr_cmd->set_args({"1", "2"});
+   > usr_cmd->run(); // it will set thrust to 1, 2 and then insert pds 
  */
 class UserCmd : public Command
 {
