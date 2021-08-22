@@ -51,7 +51,7 @@ void Test::set_steps(const std::vector<Step> &steps)
   for (const auto &step : steps) add_step(step); 
 }
 
-void Test::set_user_commands(const std::vector<UserCmd> commands)
+void Test::set_user_commands(const std::vector<UserCmd> &commands)
 {
   for (const auto &cmd : commands) add_user_command(cmd);
 }

@@ -26,7 +26,7 @@ class Test
 
     void set_name(const std::string name); 
     void set_steps(const std::vector<Step> &steps); 
-    void set_user_commands(const std::vector<UserCmd> commands);
+    void set_user_commands(const std::vector<UserCmd> &commands);
 
     const std::string get_name() const { return _name; }
     const std::vector<Step>& get_steps() const { return _steps; }
