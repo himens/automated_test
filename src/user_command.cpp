@@ -3,14 +3,12 @@
 /**********/
 /* Constr */
 /**********/
-UserCmd::UserCmd(const size_t n) : Command(n) {}
+UserCmd::UserCmd(const std::string name, 
+	         const std::vector<std::string> &args_names) : Command(name, args_names) {}
 
 UserCmd::UserCmd(const std::string name, 
-	         const std::vector<Variable> &args) : Command(name, args) {}
-
-UserCmd::UserCmd(const std::string name, 
-                 const std::vector<Variable> &args, 
-                 const std::vector<std::shared_ptr<Command>> &commands) : Command(name, args) 
+                 const std::vector<std::string> &args_names, 
+                 const std::vector<std::shared_ptr<Command>> &commands) : Command(name, args_names) 
 { 
   set_commands(commands); 
 } 
@@ -25,7 +23,6 @@ void UserCmd::run()
   {
     // set cmd args values 
     std::vector<std::string> values; 
-    
     for (auto arg : cmd->get_args()) 
     {
       auto it = std::find_if(get_args().begin(), get_args().end(), 

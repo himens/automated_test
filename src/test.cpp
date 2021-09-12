@@ -104,12 +104,25 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
   else if (name == "check") cmd = std::make_shared<CheckCmd>();
   else if (it != _user_commands.end()) // check if cmd name is an user-command...
   {
-    UserCmd usr_cmd{it->get_name(), it->get_args()};
+    std::vector<std::string> args_names;
+    for (auto arg : it->get_args()) 
+    {
+      args_names.push_back( arg.get_name() );
+    }
+
+    UserCmd usr_cmd = {it->get_name(), args_names};
 
     for (auto cmd : it->get_commands())
     {
       auto c = make_command( cmd->get_name() );
-      c->set_args( cmd->get_args() );
+
+      std::vector<std::string> values;
+      for (auto arg : cmd->get_args()) 
+      {
+	values.push_back( arg.get_value() );
+      }
+      c->set_args_values(values);
+
       usr_cmd.add_command(c);
     }
 
@@ -240,10 +253,8 @@ void Test::read_test_file(const std::string filename)
 
       auto name = sect_args[0];
       Utils::erase_front(sect_args);
-      std::vector<Variable> args;
-      for (auto arg : sect_args) args.push_back(arg);
 
-      UserCmd usr_cmd{name, args};
+      UserCmd usr_cmd{name, sect_args};
 
       /* Parse body */ 
       while (std::getline(file, line) && !is_end_of_section(line))

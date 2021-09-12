@@ -3,7 +3,7 @@
 /*****************/
 /* Check command */
 /*****************/
-CheckCmd::CheckCmd() : Command("check", 1) {}
+CheckCmd::CheckCmd() : Command("check", {"$expr"}) {}
 
 /* Run command */
 void CheckCmd::run()
@@ -42,7 +42,7 @@ void CheckCmd::write_report(std::ofstream &file) const
 /**********************/
 /* Set thrust command */
 /**********************/
-SetThrustCmd::SetThrustCmd() : Command("set_thrust", 1) {}
+SetThrustCmd::SetThrustCmd() : Command("set_thrust", {"$thrust"}) {}
 
 /* Run command */
 void SetThrustCmd::run()
@@ -72,7 +72,7 @@ void SetThrustCmd::write_report(std::ofstream &file) const
 /**********************/
 /* Insert PDS command */
 /**********************/
-InsertPdsCmd::InsertPdsCmd() : Command("insert_pds", 0) {}
+InsertPdsCmd::InsertPdsCmd() : Command("insert_pds", {}) {}
 
 /* Run command */
 void InsertPdsCmd::run() 

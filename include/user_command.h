@@ -25,13 +25,11 @@
 class UserCmd : public Command
 {
   public:
-    UserCmd(const size_t n);
+    UserCmd(const std::string name, 
+	    const std::vector<std::string> &args_names);
 
     UserCmd(const std::string name, 
-	    const std::vector<Variable> &args);
-
-    UserCmd(const std::string name, 
-  	    const std::vector<Variable> &args, 
+  	    const std::vector<std::string> &args_names, 
 	    const std::vector<std::shared_ptr<Command>> &commands);
 
     /* Run command */

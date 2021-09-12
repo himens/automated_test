@@ -14,9 +14,7 @@
 class Command
 {
   public:
-    Command(const size_t num_rgs);
-    Command(const std::string name, const size_t num_args);
-    Command(const std::string name, const std::vector<Variable> &args);
+    Command(const std::string name, const std::vector<std::string> &args_names);
 
     /* Run command */
     virtual void run() = 0;
@@ -25,7 +23,6 @@ class Command
     virtual void write_report(std::ofstream &file) const = 0;
 
     /* Set/get */
-    void set_args(const std::vector<Variable> &args);
     void set_args_values(const std::vector<std::string> &values);
     void set_name(const std::string name);
     
