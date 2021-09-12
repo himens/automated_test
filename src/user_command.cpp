@@ -6,14 +6,11 @@
 UserCmd::UserCmd(const size_t n) : Command(n) {}
 
 UserCmd::UserCmd(const std::string name, 
-	         const std::vector<Variable> &args) : Command(name, args.size()) 
-{ 
-  set_args(args); 
-}
+	         const std::vector<Variable> &args) : Command(name, args) {}
 
 UserCmd::UserCmd(const std::string name, 
                  const std::vector<Variable> &args, 
-                 const std::vector<std::shared_ptr<Command>> &commands) : UserCmd(name, args) 
+                 const std::vector<std::shared_ptr<Command>> &commands) : Command(name, args) 
 { 
   set_commands(commands); 
 } 

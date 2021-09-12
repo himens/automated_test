@@ -3,9 +3,9 @@
 /**********/
 /* Constr */
 /**********/
-Command::Command(const size_t n) 
+Command::Command(const size_t num_args) 
 { 
-  _args.resize(n); 
+  _args.resize(num_args); 
 
   for (size_t i = 0; i < _args.size(); i++)
   {
@@ -13,9 +13,14 @@ Command::Command(const size_t n)
   }
 }
 
-Command::Command(const std::string name, const size_t n) : Command(n) 
+Command::Command(const std::string name, const size_t num_args) : Command(num_args) 
 { 
   set_name(name);
+}
+
+Command::Command(const std::string name, const std::vector<Variable> &args) : Command(name, args.size())
+{ 
+  set_args(args);
 }
 
 

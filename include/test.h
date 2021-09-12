@@ -33,19 +33,6 @@ class Test
     const std::vector<UserCmd>& get_user_commands() { return _user_commands; } 
 
   private:
-    /* Make predefined command object */
-    std::shared_ptr<Command> make_predefined_cmd(const std::string name)
-    {
-      std::shared_ptr<Command> cmd = nullptr;
-
-      if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
-      else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
-      else if (name == "check") cmd = std::make_shared<CheckCmd>();
-
-      return cmd;
-    }
-
-  private:
     std::string _name;
     std::vector<Step> _steps = {};
     std::vector<UserCmd> _user_commands = {};

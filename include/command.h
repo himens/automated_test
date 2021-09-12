@@ -14,8 +14,9 @@
 class Command
 {
   public:
-    Command(const size_t n);
-    Command(const std::string name, const size_t n);
+    Command(const size_t num_rgs);
+    Command(const std::string name, const size_t num_args);
+    Command(const std::string name, const std::vector<Variable> &args);
 
     /* Run command */
     virtual void run() = 0;
