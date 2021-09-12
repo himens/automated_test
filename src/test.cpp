@@ -204,7 +204,8 @@ void Test::read_test_file(const std::string filename)
 
     auto tokens = Utils::tokens(line);
     auto section = tokens[0];
-    Utils::erase_front(tokens);
+
+    tokens.erase( tokens.begin() );
     auto sect_args = tokens;
 
     /* '\step' section */
@@ -227,7 +228,8 @@ void Test::read_test_file(const std::string filename)
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	Utils::erase_front(tokens);
+
+	tokens.erase( tokens.begin() );
 	auto cmd_args = tokens;
 
 	auto cmd = make_command(cmd_name);
@@ -252,7 +254,7 @@ void Test::read_test_file(const std::string filename)
       }
 
       auto name = sect_args[0];
-      Utils::erase_front(sect_args);
+      sect_args.erase( sect_args.begin() );
 
       UserCmd usr_cmd{name, sect_args};
 
@@ -265,7 +267,8 @@ void Test::read_test_file(const std::string filename)
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
-	Utils::erase_front(tokens);
+    
+	tokens.erase( tokens.begin() );
 	auto cmd_args = tokens;
 	
 	auto cmd = make_command(cmd_name);

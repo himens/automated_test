@@ -18,7 +18,7 @@
    > cmd2->set_args("$y");
    >
    > usr_cmd->set_commands({cmd1, cmd2, cmd3});
-   > usr_cmd->set_args({"1", "2"});
+   > usr_cmd->set_args_values({"1", "2"});
    > usr_cmd->run(); // it will set thrust to 1, 2 and then insert pds 
  */
 class UserCmd : public Command

@@ -41,30 +41,23 @@ namespace Utils
   {
     std::vector<std::string> tokens;
     std::string token;
-    auto first = line.find_first_of('"');
-    auto last = line.find_last_of('"');
+    std::istringstream iss(line);
 
-    // do not tokenize what's inside quotes
-    if (first != std::string::npos && last != std::string::npos && delim != '"') 
+    while (std::getline(iss, token, delim)) 
     {
-      std::istringstream iss(line.substr(0, first));
-      while (std::getline(iss, token, delim)) 
+      // do not tokenize quotes "..."
+      if (token.find('"') != std::string::npos)
       {
-	if (!token.empty()) tokens.push_back(token);
+        auto first = iss.tellg() - 1l;
+        auto last = line.find('"', first);
+	token += line.substr(first, last - first + 1);
+	iss.seekg(last + 1);
       }
-
-      tokens.push_back(line.substr(first, last));
+      
+      if (!token.empty()) tokens.push_back(token);
     }
 
-    // tokenize whole line
-    else
-    {
-      std::istringstream iss(line);
-      while (std::getline(iss, token, delim)) 
-      {
-	if (!token.empty()) tokens.push_back(token);
-      }
-    }
+    //for (auto t : tokens) std::cout << t << "\n";
 
     return tokens;
   }
@@ -76,14 +69,5 @@ namespace Utils
   void strip_char(const char c, std::string &str)
   {
     str.erase(std::remove(str.begin(), str.end(), c), str.end()); 
-  }
-
-
-  /***********************/
-  /* Erase first element */
-  /***********************/
-  void erase_front(std::vector<std::string> &vect)
-  {
-    if (vect.size() > 0) vect.erase( vect.begin() );
   }
 };
