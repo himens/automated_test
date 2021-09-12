@@ -8,7 +8,7 @@ CheckCmd::CheckCmd() : Command("check", 1) {}
 /* Run command */
 void CheckCmd::run()
 {
-  auto expr = this->get_args().at(0);
+  auto expr = get_args().at(0).get_value();
   auto begin = expr.find("$");
   auto end = expr.find(" ");
   std::vector<Variable> variables;
@@ -47,7 +47,7 @@ SetThrustCmd::SetThrustCmd() : Command("set_thrust", 1) {}
 /* Run command */
 void SetThrustCmd::run()
 {
-  auto value = this->get_args().at(0);
+  auto value = get_args().at(0).get_value();
   if (!Utils::is_digit(value)) 
   {
     throw Error("SetThrustCmd: value '" + value + "' is not a number!");

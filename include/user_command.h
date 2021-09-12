@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "variable.h"
 #include "command.h"
 
 /* UserCmd class: it can be seen as a new command with its own arguments.
@@ -27,10 +28,10 @@ class UserCmd : public Command
     UserCmd(const size_t n);
 
     UserCmd(const std::string name, 
-	    const std::vector<std::string> &placeholders);
+	    const std::vector<Variable> &args);
 
     UserCmd(const std::string name, 
-  	    const std::vector<std::string> &placeholders, 
+  	    const std::vector<Variable> &args, 
 	    const std::vector<std::shared_ptr<Command>> &commands);
 
     /* Run command */
@@ -43,13 +44,10 @@ class UserCmd : public Command
     void add_command(const std::shared_ptr<Command> cmd);
 
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
-    void set_placeholders(const std::vector<std::string> &placeholders);
     
     const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }
-    const std::vector<std::string>& get_placeholders() const { return _placeholders; }
 
   private:
     std::vector<std::shared_ptr<Command>> _commands;
-    std::vector<std::string> _placeholders;
 };
 #endif

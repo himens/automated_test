@@ -103,7 +103,7 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 
     if (it != _user_commands.end()) 
     {
-      UserCmd usr_cmd{it->get_name(), it->get_placeholders()};
+      UserCmd usr_cmd{it->get_name(), it->get_args()};
 
       for (auto cmd : it->get_commands())
       {
@@ -174,28 +174,6 @@ void Test::read_test_file(const std::string filename)
     }
   };
 
-  // utility function: replace variables with their values
-  auto replace_variable_with_val = [&] (std::vector<std::string> &args)
-  {
-    for (auto &arg : args) 
-    {
-      if (!arg.empty() && arg.front() == '$') 
-      {
-	auto it = std::find_if(_read_variables.begin(), _read_variables.end(), 
-	    [&] (Variable var) { return var.get_name() == arg; });
-
-	if (it != _read_variables.end()) 
-	{
-	  arg = it->get_value();
-	}
-	else 
-	{
-	  throw Error("syntax error: variable '" + arg + "' not defined!");
-	}
-      }
-    }
-  };
-
   /* Open file */
   Utils::print_banner("Read file: '" + filename + "'");
 
@@ -239,10 +217,8 @@ void Test::read_test_file(const std::string filename)
 	Utils::erase_front(tokens);
 	auto cmd_args = tokens;
 
-	replace_variable_with_val(cmd_args);
-
 	auto cmd = make_command(cmd_name);
-	cmd->set_args(cmd_args);
+	cmd->set_args_values(cmd_args);
         step.add_command(cmd);
       } 
 
@@ -264,8 +240,10 @@ void Test::read_test_file(const std::string filename)
 
       auto name = sect_args[0];
       Utils::erase_front(sect_args);
-      auto placeholders = sect_args;
-      UserCmd usr_cmd{name, placeholders};
+      std::vector<Variable> args;
+      for (auto arg : sect_args) args.push_back(arg);
+
+      UserCmd usr_cmd{name, args};
 
       /* Parse body */ 
       while (std::getline(file, line) && !is_end_of_section(line))
@@ -279,10 +257,8 @@ void Test::read_test_file(const std::string filename)
 	Utils::erase_front(tokens);
 	auto cmd_args = tokens;
 	
-	replace_variable_with_val(cmd_args);
-
 	auto cmd = make_command(cmd_name);
-	cmd->set_args(cmd_args);
+	cmd->set_args_values(cmd_args);
 	usr_cmd.add_command(cmd);
       } 
       
@@ -305,33 +281,6 @@ void Test::read_test_file(const std::string filename)
       read_test_file(sect_args[0]); // recursive parsing
     }
     
-    /* '\var' section */
-    else if (section == "\\var")
-    {
-      if (sect_args.size() != 3)
-      {
-	throw Error("syntax error: '" + line + "' missing arguments!");
-      }
-
-      if (sect_args[1] != ":=") 
-      {
-	throw Error("syntax error: '" + line + "' missing assignment operator ':='!");
-      }
-
-      auto name = sect_args[0];
-      auto value = sect_args[2];
-
-      auto it = std::find_if(_read_variables.begin(), _read_variables.end(), 
-	  [&] (Variable var) { return var.get_name() == name; });
-
-      if (it != _read_variables.end()) 
-      {
-	throw Error("syntax error: variable '" + name + "' already defined!");
-      }
-
-      _read_variables.push_back({name, value});
-    }
-
     /* Unknown section */
     else 
     {

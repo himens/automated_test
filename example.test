@@ -1,10 +1,8 @@
 # This is an example test 
 \include my_commands.test 
 
-\var $var1 := 18
-
-\user_cmd test2 _x
-	test $var1 _x 
+\user_cmd test2 $x
+	test 18 $x 
 	check "($ICD_NC15_CSG_HAT_MESS_1::pp_accept == 1)"
 \end
 
