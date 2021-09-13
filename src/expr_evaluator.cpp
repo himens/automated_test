@@ -73,7 +73,7 @@ namespace Detail
 	if ((i+1 < infix.length()) && is_operator(c + infix[i+1])) c += infix[++i];
       }
 
-      // add variable operand
+      // add alphabetic operand
       if (Utils::is_alphabetic(c))
       {
 	std::string var{c};
