@@ -33,9 +33,6 @@ class SetThrustCmd : public Command
     
     /* Write command report to file */
     void write_report(std::ofstream &file) const;
-    
-  private:
-    int _thrust = 0; 
 };
 
 /* Insert PDS command */
@@ -49,8 +46,5 @@ class InsertPdsCmd : public Command
         
     /* Write command report to file */
     void write_report(std::ofstream &file) const;
-
-  private:
-    bool _pds_inserted = false; 
 };
 #endif

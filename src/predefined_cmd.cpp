@@ -23,10 +23,10 @@ void CheckCmd::replace_variables(std::string &expr) const
 /* Run command */
 void CheckCmd::run()
 {
-  auto expr = get_args().at(0).get_value();
+  auto expr = get_arg_value("$expr");
   replace_variables(expr);
 
-  std::cout << "Check: " << get_args().at(0).get_value() << " " << (Utils::eval_logical_expr(expr) ? "PASSED" : "FAILED") << "\n";
+  std::cout << "Check: " << get_arg_value("$expr") << " " << (Utils::eval_logical_expr(expr) ? "PASSED" : "FAILED") << "\n";
 }
 
 /* Write command report to file */
@@ -37,10 +37,10 @@ void CheckCmd::write_report(std::ofstream &file) const
     throw Error("cannot open report file!");
   }
 
-  auto expr = get_args().at(0).get_value();
+  auto expr = get_arg_value("$expr");
   replace_variables(expr);
 
-  file << "1. Check: " << get_args().at(0).get_value() << " " << (Utils::eval_logical_expr(expr) ? "**PASSED**" : "**FAILED**") << "\n";
+  file << "1. Check: " << get_arg_value("$expr") << " " << (Utils::eval_logical_expr(expr) ? "**PASSED**" : "**FAILED**") << "\n";
 }
 
 
@@ -50,14 +50,13 @@ void CheckCmd::write_report(std::ofstream &file) const
 /* Run command */
 void SetThrustCmd::run()
 {
-  auto value = get_args().at(0).get_value();
-  if (!Utils::is_digit(value)) 
+  auto thrust = get_arg_value("$thrust");
+  if (!Utils::is_digit(thrust)) 
   {
-    throw Error("SetThrustCmd: value '" + value + "' is not a number!");
+    throw Error("SetThrustCmd: value '" + thrust + "' is not a number!");
   }
 
-  _thrust = std::stoi(value);
-  std::cout << "SetThrustCmd: thrust set to " << _thrust << "\n"; 
+  std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
 }
 
 /* Write command report to file */
@@ -68,7 +67,7 @@ void SetThrustCmd::write_report(std::ofstream &file) const
     throw Error("cannot open report file!");
   }
 
-  file << "1. Thrust set to: " << _thrust << "\n";
+  file << "1. Thrust set to: " << get_arg_value("$thrust")  << "\n";
 }
 
 
@@ -78,8 +77,7 @@ void SetThrustCmd::write_report(std::ofstream &file) const
 /* Run command */
 void InsertPdsCmd::run() 
 {
-  _pds_inserted = true;
-  std::cout << "InsertPdsCmd: pds " << (_pds_inserted ? "inserted" : "not inserted") << "\n"; 
+  std::cout << "InsertPdsCmd: pds inserted \n"; 
 }
 
 /* Write command report to file */
@@ -90,5 +88,5 @@ void InsertPdsCmd::write_report(std::ofstream &file) const
     throw Error("cannot open report file!");
   }
 
-  file << "1. Pds status: " << (_pds_inserted ? "inserted" : "not inserted") << "\n";
+  file << "1. Pds status: inserted \n";
 }

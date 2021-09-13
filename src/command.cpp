@@ -33,6 +33,19 @@ void Command::set_args_values(const std::vector<std::string> &values)
   }
 }
 
+const std::string Command::get_arg_value(const std::string name) const
+{
+  auto it = std::find_if(_args.begin(), _args.end(), 
+      [&] (Variable arg) { return arg.get_name() == name; });
+
+  if (it == _args.end())
+  {
+    throw Error("Command::get_arg: '" + name + "' not an argument of command '" + _name + "'!");
+  }
+    
+  return it->get_value();
+};
+
 void Command::set_name(const std::string name) 
 { 
   if (name.empty()) 

@@ -27,6 +27,7 @@ class Command
     void set_name(const std::string name);
     
     const std::vector<Variable>& get_args() const { return _args; }
+    const std::string get_arg_value(const std::string name) const;
     const std::string get_name() const { return _name; }
 
   private:
