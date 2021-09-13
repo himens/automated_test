@@ -7,7 +7,7 @@
 void CheckCmd::replace_variables(std::string &expr) const
 {
   auto begin = expr.find("$");
-  auto end = expr.find(" ");
+  auto end = expr.find(" ", begin);
 
   while (begin != std::string::npos && end != std::string::npos) 
   {

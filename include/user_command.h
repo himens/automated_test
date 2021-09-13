@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "variable.h"
 #include "command.h"
 
 /* UserCmd class: a set of existing commands. It can be seen as a new command with its own arguments.

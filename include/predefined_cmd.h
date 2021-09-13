@@ -3,7 +3,6 @@
 
 #include "command.h"
 #include "utils.h"
-#include "variable.h"
 
 /* Check command */
 class CheckCmd : public Command
