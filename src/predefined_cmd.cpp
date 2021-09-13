@@ -5,26 +5,32 @@
 /*****************/
 CheckCmd::CheckCmd() : Command("check", {"$expr"}) {}
 
-/* Run command */
-void CheckCmd::run()
+/* Replace variables in expr */
+void CheckCmd::replace_variables(std::string &expr) const
 {
-  auto expr = get_args().at(0).get_value();
   auto begin = expr.find("$");
   auto end = expr.find(" ");
-  std::vector<Variable> variables;
 
   while (begin != std::string::npos && end != std::string::npos) 
   {
     auto var = expr.substr(begin, end - begin);
-    variables.push_back({var, "1"});
+    expr.replace(begin, var.length(), "1"); // replace with mem. area data
+    //std::cout << "var: " << var << "\n";
 
-    begin = expr.find("$", end + 1);
+    begin = expr.find("$");
     end = expr.find(" ", begin);
   }
+}
 
-  _expr = {expr, variables};
+/* Run command */
+void CheckCmd::run()
+{
+  auto expr = get_args().at(0).get_value();
+  ExprEvaluator eval;
 
-  std::cout << "Check: " << expr << " " << (_expr.eval() ? "PASSED" : "FAILED") << "\n";
+  replace_variables(expr);
+
+  std::cout << "Check: " << get_args().at(0).get_value() << " " << (eval.eval(expr) ? "PASSED" : "FAILED") << "\n";
 }
 
 /* Write command report to file */
@@ -35,7 +41,12 @@ void CheckCmd::write_report(std::ofstream &file) const
     throw Error("cannot open report file!");
   }
 
-  file << "1. Check: " << _expr.get_expr() << " " << (_expr.eval() ? "**PASSED**" : "**FAILED**") << "\n";
+  auto expr = get_args().at(0).get_value();
+  ExprEvaluator eval;
+
+  replace_variables(expr);
+
+  file << "1. Check: " << get_args().at(0).get_value() << " " << (eval.eval(expr) ? "**PASSED**" : "**FAILED**") << "\n";
 }
 
 

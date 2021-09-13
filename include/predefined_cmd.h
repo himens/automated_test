@@ -4,7 +4,7 @@
 #include "command.h"
 #include "utils.h"
 #include "variable.h"
-#include "logical_expr.h"
+#include "expr_evaluator.h"
 
 /* Check command */
 class CheckCmd : public Command
@@ -17,9 +17,10 @@ class CheckCmd : public Command
     
     /* Write command report to file */
     void write_report(std::ofstream &file) const;
-   
-  private: 
-    LogicalExpr _expr;
+
+  private:
+    /* Replace variables in expr */
+    void replace_variables(std::string &expr) const;
 };
 
 /* Set thrust command */

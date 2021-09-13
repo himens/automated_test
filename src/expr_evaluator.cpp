@@ -1,4 +1,4 @@
-#include "logical_expr.h"
+#include "expr_evaluator.h"
 
 /********************/
 /* Detail namespace */
@@ -74,7 +74,7 @@ namespace Detail
       }
 
       // add variable operand
-      if (c == "$")
+      if (Utils::is_alphabetic(c))
       {
 	std::string var{c};
 
@@ -131,7 +131,7 @@ namespace Detail
   };
 
   // evaluate postfix
-  auto eval_postfix = [&] (const std::string postfix, const std::vector<Variable> &variables)
+  auto eval_postfix = [&] (const std::string postfix)
   {
     std::stack<float> s;
     bool result = false;
@@ -171,28 +171,8 @@ namespace Detail
 	while ((i+1 < postfix.length()) && Utils::is_digit({postfix[i+1]})) op += postfix[++i];
 
 	//std::cout << "numeric op: " << op << "\n";
+
 	s.push(std::stof(op));
-      }
-
-      // push variable operand on stack
-      else if (c == "$")
-      {
-	std::string name{c};
-
-	while ((i+1 < postfix.length()) && postfix[i+1] != ' ') name += postfix[++i];
-	
-	auto it = std::find_if(variables.begin(), variables.end(), 
-	    [&] (Variable var) { return var.get_name() == name; });
-
-	if (it != variables.end())
-	{
-	  s.push(std::stof(it->get_value()));
-	  //std::cout << "variable op: " << var << ", value: " << it->get_value() << "\n";
-	}
-	else
-	{
-	  throw Error("eval_postfix: unknown variable '" + name + "'! Cannot be replaced by value!"); 
-	}
       }
     }
 
@@ -210,36 +190,17 @@ namespace Detail
 /**********/
 /* Constr */
 /**********/
-LogicalExpr::LogicalExpr() {};
-
-LogicalExpr::LogicalExpr(const std::string expr, const std::vector<Variable> &variables) 
-{
-  set_expr(expr);
-  set_variables(variables);
-}
-
-
-/***********/
-/* Set/get */
-/***********/
-void LogicalExpr::set_expr(const std::string expr) 
-{ 
-  _expr = expr; 
-}
-
-void LogicalExpr::set_variables(const std::vector<Variable> &variables) 
-{ 
-  _variables = variables; 
-}
+ExprEvaluator::ExprEvaluator() {};
 
 
 /*******************************/
 /* Evaluate logical expression */
 /*******************************/
-bool LogicalExpr::eval() const
+bool ExprEvaluator::eval(const std::string expr) const
 {
-  auto postfix = Detail::to_postfix(_expr);
-  bool result = Detail::eval_postfix(postfix, _variables);
+  auto postfix = Detail::to_postfix(expr);
+  //std::cout << postfix << "\n";
+  bool result = Detail::eval_postfix(postfix);
 
   return result;
 }
