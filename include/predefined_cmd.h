@@ -4,13 +4,12 @@
 #include "command.h"
 #include "utils.h"
 #include "variable.h"
-#include "expr_evaluator.h"
 
 /* Check command */
 class CheckCmd : public Command
 {
   public:
-    CheckCmd();
+    CheckCmd() : Command("check", {"$expr"}) {}
 
     /* Run command */
     void run();
@@ -27,7 +26,7 @@ class CheckCmd : public Command
 class SetThrustCmd : public Command
 {
   public:
-    SetThrustCmd();
+    SetThrustCmd() : Command("set_thrust", {"$thrust"}) {}
 
     /* Run command */
     void run();
@@ -43,7 +42,7 @@ class SetThrustCmd : public Command
 class InsertPdsCmd : public Command
 {
   public:
-    InsertPdsCmd();
+    InsertPdsCmd() : Command("insert_pds", {}) {}
 
     /* Run command */
     void run(); 

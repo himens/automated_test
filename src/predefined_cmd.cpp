@@ -3,8 +3,6 @@
 /*****************/
 /* Check command */
 /*****************/
-CheckCmd::CheckCmd() : Command("check", {"$expr"}) {}
-
 /* Replace variables in expr */
 void CheckCmd::replace_variables(std::string &expr) const
 {
@@ -26,11 +24,9 @@ void CheckCmd::replace_variables(std::string &expr) const
 void CheckCmd::run()
 {
   auto expr = get_args().at(0).get_value();
-  ExprEvaluator eval;
-
   replace_variables(expr);
 
-  std::cout << "Check: " << get_args().at(0).get_value() << " " << (eval.eval(expr) ? "PASSED" : "FAILED") << "\n";
+  std::cout << "Check: " << get_args().at(0).get_value() << " " << (Utils::eval_logical_expr(expr) ? "PASSED" : "FAILED") << "\n";
 }
 
 /* Write command report to file */
@@ -42,19 +38,15 @@ void CheckCmd::write_report(std::ofstream &file) const
   }
 
   auto expr = get_args().at(0).get_value();
-  ExprEvaluator eval;
-
   replace_variables(expr);
 
-  file << "1. Check: " << get_args().at(0).get_value() << " " << (eval.eval(expr) ? "**PASSED**" : "**FAILED**") << "\n";
+  file << "1. Check: " << get_args().at(0).get_value() << " " << (Utils::eval_logical_expr(expr) ? "**PASSED**" : "**FAILED**") << "\n";
 }
 
 
 /**********************/
 /* Set thrust command */
 /**********************/
-SetThrustCmd::SetThrustCmd() : Command("set_thrust", {"$thrust"}) {}
-
 /* Run command */
 void SetThrustCmd::run()
 {
@@ -83,8 +75,6 @@ void SetThrustCmd::write_report(std::ofstream &file) const
 /**********************/
 /* Insert PDS command */
 /**********************/
-InsertPdsCmd::InsertPdsCmd() : Command("insert_pds", {}) {}
-
 /* Run command */
 void InsertPdsCmd::run() 
 {
