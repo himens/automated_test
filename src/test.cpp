@@ -159,14 +159,16 @@ void Test::read_test_file(const std::string filename)
   };
 
   // utility function: check end section in line
-  auto is_end_of_section = [] (const std::string line)
+  auto is_end_of_section = [&] (std::string line)
   {
+    strip_tabs_and_comments(line); 
+
     auto tokens = Utils::tokens(line);
 
     return tokens.size() > 0 && tokens.front() == "\\end";
   };
 
-  // utility function:perform some sanity checks on body line
+  // utility function: perform some sanity checks on body line
   auto check_body_line = [&] (const std::string line)
   {
     if (line.empty() || is_end_of_section(line) || is_comment(line)) return;
@@ -186,6 +188,22 @@ void Test::read_test_file(const std::string filename)
       throw Error("syntax error: line '" + line + "' not indented (" + std::to_string(tabs) + " tabs)!");
     }
   };
+
+  // utility function: add lines after carriage return 
+  auto add_carriage_return_lines = [&] (std::ifstream &file, std::string &line)
+  {
+    std::string new_line = line;
+
+    while (new_line.find("\\") != std::string::npos)
+    {
+      std::getline(file, new_line);
+      strip_tabs_and_comments(new_line); 
+      
+      line += new_line;
+      Utils::strip_char('\\', line);
+    }
+  };
+
 
   /* Open file */
   Utils::print_banner("Read file: '" + filename + "'");
@@ -225,6 +243,7 @@ void Test::read_test_file(const std::string filename)
 	if (line.empty() || is_comment(line)) continue;
 	check_body_line(line);
 	strip_tabs_and_comments(line);
+	add_carriage_return_lines(file, line);
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];
@@ -264,6 +283,7 @@ void Test::read_test_file(const std::string filename)
 	if (line.empty() || is_comment(line)) continue;
 	check_body_line(line);
 	strip_tabs_and_comments(line);
+	add_carriage_return_lines(file, line);
 
 	auto tokens = Utils::tokens(line);
 	auto cmd_name = tokens[0];

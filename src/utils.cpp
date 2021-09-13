@@ -50,8 +50,12 @@ namespace Utils
       {
         auto first = iss.tellg() - 1l;
         auto last = line.find('"', first);
-	token += line.substr(first, last - first + 1);
-	iss.seekg(last + 1);
+
+	if (last != std::string::npos)
+	{
+	  token += line.substr(first, last - first + 1);
+	  iss.seekg(last + 1);
+	}
       }
       
       if (!token.empty()) tokens.push_back(token);
