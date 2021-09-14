@@ -14,6 +14,30 @@ Command::Command(const std::string name, const std::vector<std::string> &args_na
 }
 
 
+/***************/
+/* Run command */
+/***************/
+void Command::run(const std::vector<std::string> &values)
+{
+  set_args_values(values);
+  run();
+}
+
+
+/********************************/
+/* Write command report to file */
+/********************************/
+void Command::write_report(std::ofstream &file) const
+{
+  if (!file.is_open())
+  {
+    throw Error("cannot open report file!");
+  }
+
+  file << _report_msg + "\n";
+}
+
+
 /***********/
 /* Set/get */
 /***********/
@@ -54,4 +78,9 @@ void Command::set_name(const std::string name)
   }
 
   _name = name; 
+}
+
+void Command::set_report_msg(const std::string msg) 
+{ 
+  _report_msg = msg; 
 }

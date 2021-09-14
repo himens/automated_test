@@ -12,13 +12,6 @@ class CheckCmd : public Command
 
     /* Run command */
     void run();
-    
-    /* Write command report to file */
-    void write_report(std::ofstream &file) const;
-
-  private:
-    /* Replace variables in expr */
-    void replace_variables(std::string &expr) const;
 };
 
 /* Set thrust command */
@@ -29,9 +22,6 @@ class SetThrustCmd : public Command
 
     /* Run command */
     void run();
-    
-    /* Write command report to file */
-    void write_report(std::ofstream &file) const;
 };
 
 /* Insert PDS command */
@@ -42,8 +32,5 @@ class InsertPdsCmd : public Command
 
     /* Run command */
     void run(); 
-        
-    /* Write command report to file */
-    void write_report(std::ofstream &file) const;
 };
 #endif

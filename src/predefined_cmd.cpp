@@ -3,44 +3,26 @@
 /*****************/
 /* Check command */
 /*****************/
-/* Replace variables in expr */
-void CheckCmd::replace_variables(std::string &expr) const
-{
-  auto begin = expr.find("$");
-  auto end = expr.find(" ", begin);
-
-  while (begin != std::string::npos && end != std::string::npos) 
-  {
-    auto var = expr.substr(begin, end - begin);
-    expr.replace(begin, var.length(), "1"); // replace with mem. area data
-    //std::cout << "var: " << var << "\n";
-
-    begin = expr.find("$");
-    end = expr.find(" ", begin);
-  }
-}
-
 /* Run command */
 void CheckCmd::run()
 {
   auto expr = get_arg_value("$expr");
-  replace_variables(expr);
+  auto begin = expr.find("$");
+  auto end = expr.find(" ", begin);
 
-  std::cout << "Check: " << get_arg_value("$expr") << " " << (Utils::eval_logical_expr(expr) ? "PASSED" : "FAILED") << "\n";
-}
-
-/* Write command report to file */
-void CheckCmd::write_report(std::ofstream &file) const
-{
-  if (!file.is_open())
+   // replace $AREA::FIELD variable with mem. area data
+  while (begin != std::string::npos && end != std::string::npos) 
   {
-    throw Error("cannot open report file!");
+    auto var = expr.substr(begin, end - begin);
+    expr.replace(begin, var.length(), "1"); // replace with mem. area data
+
+    begin = expr.find("$");
+    end = expr.find(" ", begin);
   }
 
-  auto expr = get_arg_value("$expr");
-  replace_variables(expr);
+  set_report_msg("1. Check: " + get_arg_value("$expr") + " " + (Utils::eval_logical_expr(expr) ? "**PASSED**" : "**FAILED**"));
 
-  file << "1. Check: " << get_arg_value("$expr") << " " << (Utils::eval_logical_expr(expr) ? "**PASSED**" : "**FAILED**") << "\n";
+  std::cout << "Check: " << get_arg_value("$expr") << " " << (Utils::eval_logical_expr(expr) ? "PASSED" : "FAILED") << "\n";
 }
 
 
@@ -56,18 +38,9 @@ void SetThrustCmd::run()
     throw Error("SetThrustCmd: value '" + thrust + "' is not a number!");
   }
 
+  set_report_msg("1. Thrust set to: " + get_arg_value("$thrust"));
+
   std::cout << "SetThrustCmd: thrust set to " << thrust << "\n"; 
-}
-
-/* Write command report to file */
-void SetThrustCmd::write_report(std::ofstream &file) const 
-{
-  if (!file.is_open())
-  {
-    throw Error("cannot open report file!");
-  }
-
-  file << "1. Thrust set to: " << get_arg_value("$thrust")  << "\n";
 }
 
 
@@ -77,16 +50,8 @@ void SetThrustCmd::write_report(std::ofstream &file) const
 /* Run command */
 void InsertPdsCmd::run() 
 {
+  set_report_msg("1. Pds status: inserted");
+
   std::cout << "InsertPdsCmd: pds inserted \n"; 
 }
 
-/* Write command report to file */
-void InsertPdsCmd::write_report(std::ofstream &file) const 
-{
-  if (!file.is_open())
-  {
-    throw Error("cannot open report file!");
-  }
-
-  file << "1. Pds status: inserted \n";
-}

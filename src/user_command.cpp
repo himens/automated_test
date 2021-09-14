@@ -19,6 +19,8 @@ UserCmd::UserCmd(const std::string name,
 /***************/
 void UserCmd::run()
 {
+  std::string report_msg;
+
   for (auto cmd : _commands) 
   {
     // set cmd args values 
@@ -32,18 +34,13 @@ void UserCmd::run()
       values.push_back(value);
     }
 
-    cmd->set_args_values(values);
-    cmd->run();
+    cmd->run(values);
+
+    report_msg += cmd->get_report_msg();
+    if (cmd != _commands.back()) report_msg += "\n";
   }
-}
-
-
-/********************************/
-/* Write command report to file */
-/********************************/
-void UserCmd::write_report(std::ofstream &file) const
-{
-  for (auto cmd : _commands) cmd->write_report(file);
+    
+  set_report_msg(report_msg);
 }
 
 

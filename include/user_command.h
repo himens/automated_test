@@ -17,8 +17,7 @@
    > cmd2->set_args("$y");
    >
    > usr_cmd->set_commands({cmd1, cmd2, cmd3});
-   > usr_cmd->set_args_values({"1", "2"});
-   > usr_cmd->run(); // it will set thrust to 1, 2 and then insert pds 
+   > usr_cmd->run({"1", "2"}); // it will set thrust to 1, 2 and then insert pds 
  */
 class UserCmd : public Command
 {
@@ -33,12 +32,8 @@ class UserCmd : public Command
     /* Run command */
     void run();
     
-    /* Write command report to file */
-    void write_report(std::ofstream &file) const;
-
     /* Set/get */
     void add_command(const std::shared_ptr<Command> cmd);
-
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
     
     const std::vector<std::shared_ptr<Command>>& get_commands() const { return _commands; }

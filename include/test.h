@@ -23,7 +23,6 @@ class Test
     /* Set/get */
     void add_user_command(const UserCmd &cmd);
     void add_step(const Step &step);
-
     void set_name(const std::string name); 
     void set_steps(const std::vector<Step> &steps); 
     void set_user_commands(const std::vector<UserCmd> &commands);
@@ -36,6 +35,5 @@ class Test
     std::string _name;
     std::vector<Step> _steps = {};
     std::vector<UserCmd> _user_commands = {};
-    std::vector<Variable> _read_variables = {};
 };
 #endif

@@ -104,13 +104,13 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
   else if (name == "check") cmd = std::make_shared<CheckCmd>();
   else if (it != _user_commands.end()) // check if cmd name is an user-command...
   {
-    std::vector<std::string> args_names;
+    std::vector<std::string> args;
     for (auto arg : it->get_args()) 
     {
-      args_names.push_back( arg.get_name() );
+      args.push_back( arg.get_name() );
     }
 
-    UserCmd usr_cmd = {it->get_name(), args_names};
+    UserCmd usr_cmd = {it->get_name(), args};
 
     for (auto cmd : it->get_commands())
     {

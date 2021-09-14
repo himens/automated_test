@@ -22,7 +22,6 @@ class Step
     
     /* Set/get */
     void add_command(const std::shared_ptr<Command> cmd);
-
     void set_name(const std::string name); 
     void set_commands(const std::vector<std::shared_ptr<Command>> &commands);
 
