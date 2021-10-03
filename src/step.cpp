@@ -77,6 +77,7 @@ void Step::add_command(const std::shared_ptr<Command> cmd)
 
 void Step::set_commands(const std::vector<std::shared_ptr<Command>> &commands) 
 { 
+  _commands.clear();
   for (const auto &cmd : commands) add_command(cmd); 
 }
 

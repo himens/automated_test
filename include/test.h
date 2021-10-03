@@ -24,16 +24,14 @@ class Test
     void add_user_command(const UserCmd &cmd);
     void add_step(const Step &step);
     void set_name(const std::string name); 
-    void set_steps(const std::vector<Step> &steps); 
-    void set_user_commands(const std::vector<UserCmd> &commands);
 
     const std::string get_name() const { return _name; }
-    const std::vector<Step>& get_steps() const { return _steps; }
-    const std::vector<UserCmd>& get_user_commands() { return _user_commands; } 
+    const std::map<std::string, Step>& get_step_map() const { return _step_map; }
+    const std::map<std::string, UserCmd>& get_user_command_map() { return _user_command_map; } 
 
   private:
     std::string _name;
-    std::vector<Step> _steps = {};
-    std::vector<UserCmd> _user_commands = {};
+    std::map<std::string, Step> _step_map = {};
+    std::map<std::string, UserCmd> _user_command_map = {};
 };
 #endif

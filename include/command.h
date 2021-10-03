@@ -17,6 +17,7 @@
 class Command
 {
   public:
+    Command() {};
     Command(const std::string name, const std::vector<std::string> &args_names);
 
     /* Run command */

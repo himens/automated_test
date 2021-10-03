@@ -59,6 +59,7 @@ void UserCmd::add_command(const std::shared_ptr<Command> cmd)
 
 void UserCmd::set_commands(const std::vector<std::shared_ptr<Command>> &commands) 
 { 
+  _commands.clear();
   for (const auto &cmd : commands) add_command(cmd); 
 }
 

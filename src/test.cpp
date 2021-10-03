@@ -14,26 +14,24 @@ Test::Test(const std::string name)
 /***********/
 /* Set/get */
 /***********/
-void Test::add_user_command(const UserCmd &usr_cmd)
+void Test::add_user_command(const UserCmd &cmd)
 {
-  if (std::find_if(_user_commands.begin(), _user_commands.end(), 
-	[&] (UserCmd cmd) { return cmd.get_name() == usr_cmd.get_name(); }) != _user_commands.end())
+  if (_user_command_map.count(cmd.get_name()) > 0) 
   {
-    throw Error("Test::add_user_command: user-command '" + usr_cmd.get_name() + "' already defined!"); 
+    throw Error("Test::add_user_command: user-command '" + cmd.get_name() + "' already defined!"); 
   }
 
-  _user_commands.push_back(usr_cmd);
+  _user_command_map[cmd.get_name()] = cmd;
 }
 
 void Test::add_step(const Step &step) 
 { 
-  if (std::find_if(_steps.begin(), _steps.end(), 
-	[&] (Step s) { return s.get_name() == step.get_name(); }) != _steps.end())
+  if (_step_map.count(step.get_name()) > 0)
   {
     throw Error("Test::add_step: step '" + step.get_name() + "' already defined!"); 
   }
 
-  _steps.push_back(step); 
+  _step_map[step.get_name()] = step; 
 }
 
 void Test::set_name(const std::string name) 
@@ -44,16 +42,6 @@ void Test::set_name(const std::string name)
   }
 
   _name = name; 
-}
-
-void Test::set_steps(const std::vector<Step> &steps) 
-{ 
-  for (const auto &step : steps) add_step(step); 
-}
-
-void Test::set_user_commands(const std::vector<UserCmd> &commands)
-{
-  for (const auto &cmd : commands) add_user_command(cmd);
 }
 
 
@@ -67,12 +55,13 @@ void Test::run()
   file << "# Test: '" + _name << "' \n";
 
   /* Run test */
-  if (_steps.size() > 0)
+  if (_step_map.size() > 0)
   {
     Utils::print_banner("Run test: '" + _name + "'");
 
-    for (auto step : _steps) 
+    for (auto &p : _step_map) 
     { 
+      auto step = p.second;
       step.run();
       step.write_report(file);
     }
@@ -96,36 +85,27 @@ std::shared_ptr<Command> Test::make_command(const std::string name)
 {
   std::shared_ptr<Command> cmd = nullptr;
 
-  auto it = std::find_if(_user_commands.begin(), _user_commands.end(), 
-      [&] (UserCmd cmd) { return name == cmd.get_name(); });
-
   if (name == "set_thrust") cmd = std::make_shared<SetThrustCmd>();
   else if (name == "insert_pds") cmd = std::make_shared<InsertPdsCmd>();
   else if (name == "check") cmd = std::make_shared<CheckCmd>();
-  else if (it != _user_commands.end()) // check if cmd name is an user-command...
+  else if (_user_command_map.count(name) > 0) // check if cmd name is an user-command...
   {
-    std::vector<std::string> args;
-    for (auto arg : it->get_args()) 
+    auto usr_cmd = _user_command_map[name];
+    auto commands = usr_cmd.get_commands();
+
+    for (auto &cmd : commands)
     {
-      args.push_back( arg.get_name() );
-    }
-
-    UserCmd usr_cmd = {it->get_name(), args};
-
-    for (auto cmd : it->get_commands())
-    {
-      auto c = make_command( cmd->get_name() );
-
       std::vector<std::string> values;
       for (auto arg : cmd->get_args()) 
       {
 	values.push_back( arg.get_value() );
       }
-      c->set_args_values(values);
-
-      usr_cmd.add_command(c);
+      
+      cmd = make_command( cmd->get_name() );
+      cmd->set_args_values(values);
     }
 
+    usr_cmd.set_commands(commands);
     cmd = std::make_shared<UserCmd>(usr_cmd);
   }
   else 
@@ -253,6 +233,7 @@ void Test::read_test_file(const std::string filename)
 
 	auto cmd = make_command(cmd_name);
 	cmd->set_args_values(cmd_args);
+
         step.add_command(cmd);
       } 
 
@@ -293,6 +274,7 @@ void Test::read_test_file(const std::string filename)
 	
 	auto cmd = make_command(cmd_name);
 	cmd->set_args_values(cmd_args);
+
 	usr_cmd.add_command(cmd);
       } 
       

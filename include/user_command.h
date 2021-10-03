@@ -22,6 +22,7 @@
 class UserCmd : public Command
 {
   public:
+    UserCmd() {};
     UserCmd(const std::string name, 
 	    const std::vector<std::string> &args_names);
 
